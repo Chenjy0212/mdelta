@@ -16,7 +16,7 @@ NAME = 'modelta'
 DESCRIPTION = 'Chen and Yang Lab Multi fork Development cell lineage tree alignment '
 URL = 'https://github.com/Chenjy0212/modelta'
 EMAIL = '1026224216@qq.com'
-AUTHOR = 'EeWhile'
+AUTHOR = 'EeWhile(Jingyu Chen)'
 REQUIRES_PYTHON = '>=3.6.0'
 VERSION = '0.1.0'
 
