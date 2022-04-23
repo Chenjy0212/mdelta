@@ -1,12 +1,19 @@
+# -*- coding: utf-8 -*- 
+import os
+import sys
 
-# ¶ÁÈ¡ .nwkÀàÎÄ¼ş²¢°ÑÆ×ÏµÊ÷ÖĞµÄ½ÚµãÃû³Æ×ª»»ÎªÀàĞÍ
-# ÀıÈç   (a1,b7); ---> (a,b);
-def ReadTreeSeq_Name2Type(TreeSeqFile, Name2TypeFile):
-    file1= open(TreeSeqFile,'r') #¶ÁÈ¡µ½ÎÄ±¾µÄËùÓĞÄÚÈİ
+# è¯»å– .nwkç±»æ–‡ä»¶å¹¶æŠŠè°±ç³»æ ‘ä¸­çš„èŠ‚ç‚¹åç§°è½¬æ¢ä¸ºç±»å‹
+# ä¾‹å¦‚   (a1,b7); ---> (a,b);
+def ReadTreeSeq_Name2Type(TreeSeqFilePath, Name2TypeFilePath):
+    if TreeSeqFilePath[-1] == '/' or Name2TypeFilePath[-1] == '/':
+        print('æ–‡ä»¶å¤¹è·¯å¾„æœ«å°¾ä¸èƒ½åŠ /')
+        return
+
+    file1= open(TreeSeqFilePath,encoding='utf-8') #è¯»å–åˆ°æ–‡æœ¬çš„æ‰€æœ‰å†…å®¹
     content=file1.read()
     #print(content)
-    file2= open(Name2TypeFile,'r')
-    file2.readline() #Ìø¹ıµÚÒ»ĞĞ
+    file2= open(Name2TypeFilePath,encoding='utf-8')
+    file2.readline() #è·³è¿‡ç¬¬ä¸€è¡Œ
     while True:
         text_line = file2.readline().replace('\n', '')
         if text_line:
@@ -22,3 +29,8 @@ def ReadTreeSeq_Name2Type(TreeSeqFile, Name2TypeFile):
             break
     #print(content)
     return content.replace(';', '')
+
+
+
+
+
