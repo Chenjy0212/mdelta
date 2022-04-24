@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: modelta
-Version: 0.2.2
+Version: 0.2.3
 Summary: Chen and Yang Lab Multi fork Development cell lineage tree alignment 
 Home-page: https://github.com/Chenjy0212/modelta
 Author: EeWhile(Jingyu Chen)
@@ -14,22 +14,7 @@ Classifier: Programming Language :: Python :: 3.6
 Classifier: Programming Language :: Python :: Implementation :: CPython
 Classifier: Programming Language :: Python :: Implementation :: PyPy
 Requires-Python: >=3.6.0
-Description-Content-Type: text/markdown
 License-File: LICENSE
 
-
-# modelta
-
-Chen and Yang Lab Multi fork Development cell lineage tree alignment.
-
-<!-- TOC -->
-
-- [modelta](#modelta)
-  - [01 Brief introduction](#01-brief-introduction)
-
-<!-- /TOC -->
-
-## 01 Brief introduction
-
-`pip install modelta`
+UNKNOWN
 

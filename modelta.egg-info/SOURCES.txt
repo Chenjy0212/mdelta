@@ -5,8 +5,10 @@ setup.py
 modelta/ReadFile.py
 modelta/__init__.py
 modelta/__main__.py
+modelta/__version__.py
 modelta/mymath.py
 modelta/mytest.py
+modelta/test2.py
 modelta.egg-info/PKG-INFO
 modelta.egg-info/SOURCES.txt
 modelta.egg-info/dependency_links.txt
