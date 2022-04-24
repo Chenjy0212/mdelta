@@ -1,0 +1,14 @@
+LICENSE
+MANIFEST.in
+README.md
+setup.py
+modelta/ReadFile.py
+modelta/__init__.py
+modelta/__main__.py
+modelta/mymath.py
+modelta/mytest.py
+modelta.egg-info/PKG-INFO
+modelta.egg-info/SOURCES.txt
+modelta.egg-info/dependency_links.txt
+modelta.egg-info/requires.txt
+modelta.egg-info/top_level.txt
