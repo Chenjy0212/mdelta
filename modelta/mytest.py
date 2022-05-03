@@ -1,2 +1,2 @@
-def demola():
-    print("something output!")
+def myself():
+    print("Hello, nice to meet you, I am Ee While")

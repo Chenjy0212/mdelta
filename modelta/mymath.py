@@ -1,5 +1,7 @@
 import numpy as np
-from munkres import Munkres, print_matrix
+from munkres import Munkres
+from math import log
+import copy
 
 class Greedy_Algorithm:
     def __init__(self, Local_matrix, 
@@ -33,6 +35,31 @@ class Greedy_Algorithm:
             mat_tmp[del_i_index,:] = -99999 
             mat_tmp[:,del_j_index] = -99999
         return trace
+'''
+def topscore(mat, root1addr, root2addr, tracemat, num:int=-1):
+    mat_tmp = copy.deepcopy(mat.values)
+    scorelist=[]
+    if num == -1:
+        loopt = min(5,min(mat_tmp.shape))
+    else:
+        loopt = min(min(mat_tmp.shape), num)
+    for _ in range(loopt):
+        #print(mat_tmp)      
+        del_i_index = np.where(mat_tmp==np.max(mat_tmp))[0][0]
+        del_j_index = np.where(mat_tmp==np.max(mat_tmp))[1][0]
+        #scorelist.append([np.max(mat_tmp),mat.index[del_i_index],mat.columns[del_j_index]])
+        #scorelist.append([np.max(mat_tmp), del_i_index, del_j_index])
+        scorelist.append({'Score':np.max(mat_tmp), 
+                          'Root1_label':root1addr[del_i_index].label, 
+                          'Root1_node':root1addr[del_i_index].nodeobj,
+                          'Root2_label':root2addr[del_j_index].label, 
+                          'Root2_node':root2addr[del_j_index].nodeobj, 
+                          'row':del_i_index, 
+                          'col':del_j_index})
+        mat_tmp[del_i_index] = -999.
+        mat_tmp[:,del_j_index] = -999.
+    return scorelist
+'''
 
 def GetMaxScore(trace,
                 root1,
@@ -43,17 +70,17 @@ def GetMaxScore(trace,
                 local_matrix,
                 local_matrix_root1_index,
                 local_matrix_root2_index,
-                prune=-1,
+                prune=-1.,
                 dict_score={},
                 Algorithm:str = 'KM'):
-    # Èç¹ûÁ½¿ÃÊ÷¶¼ÊÇ£¬¼´ÊÇ¸ù½ÚµãÒ²ÊÇÒ¶½Úµã£¨µ¥Ò»ÔªËØ£©£¬Ö±½Ó²é×Öµä£¬²é²»µ½¾Í»®¹éÎª·£·ÖÖµprune
+    # å¦‚æœä¸¤æ£µæ ‘éƒ½æ˜¯ï¼Œå³æ˜¯æ ¹èŠ‚ç‚¹ä¹Ÿæ˜¯å¶èŠ‚ç‚¹ï¼ˆå•ä¸€å…ƒç´ ï¼‰ï¼Œç›´æ¥æŸ¥å­—å…¸ï¼ŒæŸ¥ä¸åˆ°å°±åˆ’å½’ä¸ºç½šåˆ†å€¼prune
     root1node = root1
     root2node = root2
     score = prune
     key = root1node.nodeobj+'_'+root2node.nodeobj
     key2 = root2node.nodeobj+'_'+root1node.nodeobj
     if root1node.left == None and root2node.left == None:
-        #Â·¾¶Ö»ÄÜÊÇ½ÚµãÖ±½ÓÆ¥Åä
+        #è·¯å¾„åªèƒ½æ˜¯èŠ‚ç‚¹ç›´æ¥åŒ¹é…
         if key in dict_score:
             if dict_score[key] > prune:
                 trace[root1_index][root2_index].append([root1.nodeobj,root2.nodeobj])
@@ -62,7 +89,7 @@ def GetMaxScore(trace,
             dict_score[key] = score
             dict_score[key2]= score
             return score
-    # Èç¹ûÖ»ÓĞÒ»¸öÊ÷±íÊ¾Îª¸ù½Úµã
+    # å¦‚æœåªæœ‰ä¸€ä¸ªæ ‘è¡¨ç¤ºä¸ºæ ¹èŠ‚ç‚¹
     elif root1node.left == None and root2node.left is not None:
         #if key in dict_score:
         #    return dict_score[key]
@@ -76,10 +103,10 @@ def GetMaxScore(trace,
             score = max(score, maxnum+(root2.leaf_count()-1)*prune)
             if score > prune:
                 trace[root1_index][root2_index].append([root1_index, local_matrix_root2_index[dearr.tolist().index(maxnum)]])
-            #root2node = root2node.left #À´µ½×ÓÊ÷ÏÂ
+            #root2node = root2node.left #æ¥åˆ°å­æ ‘ä¸‹
             #key_tmp = root1node.nodeobj+'_'+root2node.nodeobj
             #score = max(score, dict_score[key_tmp])
-            #while root2node.right: #×ÓÊ÷»¹ÓĞ½Úµã
+            #while root2node.right: #å­æ ‘è¿˜æœ‰èŠ‚ç‚¹
             #    root2node = root2node.right
             #    key_tmp = root1node.nodeobj+'_'+root2node.nodeobj
             #    score = max(score, dict_score[key_tmp])
@@ -103,10 +130,10 @@ def GetMaxScore(trace,
             score = max(score, maxnum+(root1.leaf_count()-1)*prune)
             if score > prune:
                 trace[root1_index][root2_index].append([local_matrix_root1_index[dearr.tolist().index(maxnum)],root2_index] )
-            #root1node = root1node.left #À´µ½×ÓÊ÷ÏÂ
+            #root1node = root1node.left #æ¥åˆ°å­æ ‘ä¸‹
             #key_tmp = root1node.nodeobj+'_'+root2node.nodeobj
             #score = max(score, dict_score[key_tmp])
-            #while root1node.right: #×ÓÊ÷»¹ÓĞ½Úµã
+            #while root1node.right: #å­æ ‘è¿˜æœ‰èŠ‚ç‚¹
             #    root1node = root1node.right
             #    key_tmp = root1node.nodeobj+'_'+root2node.nodeobj
             #    score = max(score, dict_score[key_tmp])
@@ -115,7 +142,7 @@ def GetMaxScore(trace,
             #dict_score[key2] = score
             #return root2.leaf_count()
             return score
-    #Á½¸öÊ÷¶¼ÊÇ·ÇÒ¶×Ó½áµã
+    #ä¸¤ä¸ªæ ‘éƒ½æ˜¯éå¶å­ç»“ç‚¹
     else:
         summ = 0
         r1leaf = root1node.leaf_count()
@@ -142,8 +169,8 @@ def GetMaxScore(trace,
         elif(Algorithm == 'GAR'):
             pass
         
-        else:#Ä¬ÈÏÎªKM¼ÆËã
-            #github°ü°æ±¾
+        else:#é»˜è®¤ä¸ºKMè®¡ç®—
+            #githubåŒ…ç‰ˆæœ¬
             trace_tmp = []
             cost_matrix = []
             for row in local_matrix:
@@ -170,7 +197,7 @@ def GetMaxScore(trace,
                 score = min(r1leaf,r2leaf)*prune
         
         
-        #±éÀú
+        #éå†
         for i in zip(root1node.son(),local_matrix_root1_index):
             if i[0].left is not None:
                 score_tmp = allmatrix[i[1],root2_index] + prune*(r1leaf - i[0].leaf_count())

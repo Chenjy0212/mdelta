@@ -18,7 +18,7 @@ URL = 'https://github.com/Chenjy0212/modelta'
 EMAIL = '1026224216@qq.com'
 AUTHOR = 'EeWhile(Jingyu Chen)'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '0.2.3'
+VERSION = '0.4.2'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
@@ -39,11 +39,11 @@ here = os.path.abspath(os.path.dirname(__file__))
 
 # Import the README and use it as the long-description.
 # Note: this will only work if 'README.md' is present in your MANIFEST.in file!
-#try:
-#    with io.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
-#        long_description = '\n' + f.read()
-#except FileNotFoundError:
-#    long_description = DESCRIPTION
+try:
+    with io.open(os.path.join(here, 'README.md'), encoding='utf-8') as f:
+        long_description = '\n' + f.read()
+except FileNotFoundError:
+    long_description = DESCRIPTION
 
 # Load the package's __version__.py module as a dictionary.
 about = {}
@@ -97,8 +97,8 @@ setup(
     name=NAME,
     version=about['__version__'],
     description=DESCRIPTION,
-    #long_description=long_description,
-    #long_description_content_type='text/markdown',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     author=AUTHOR,
     author_email=EMAIL,
     python_requires=REQUIRES_PYTHON,

@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: modelta
-Version: 0.2.3
+Version: 0.4.2
 Summary: Chen and Yang Lab Multi fork Development cell lineage tree alignment 
 Home-page: https://github.com/Chenjy0212/modelta
 Author: EeWhile(Jingyu Chen)
@@ -14,7 +14,52 @@ Classifier: Programming Language :: Python :: 3.6
 Classifier: Programming Language :: Python :: Implementation :: CPython
 Classifier: Programming Language :: Python :: Implementation :: PyPy
 Requires-Python: >=3.6.0
+Description-Content-Type: text/markdown
 License-File: LICENSE
 
-UNKNOWN
+
+# modelta
+
+Chen and Yang Lab Multi fork Development cell lineage tree alignment.
+
+<!-- TOC -->
+
+- [modelta](#modelta)
+  - [01 Introduction](#01-introduction)
+  - [02 Result](#02-result)
+
+<!-- /TOC -->
+
+## 01 Introduction
+
+
+
+>pip install -i https://test.pypi.org/simple/ modelta
+
+Then you can use this function in your Python code. As shown below(**/modelta/test2.py**):
+
+```python
+import modelta
+modelta.demola()
+print(modelta.scoremat('modelta/ExampleFile/tree.nwk','modelta/ExampleFile/Name2Type.csv','modelta/ExampleFile/tree.nwk','modelta/ExampleFile/Name2Type.csv'))
+```
+
+## 02 Result
+
+something output!
+Matrix Node: 100%|███████████████████████████████████████████████████████████████████████████████████████| 121/121 [00:00<00:00, 20213.92it/s]
+|Root2(col) & Root1(row) | 0,0,0 | 0,0,1|  0,0,2|  0,1|  0,2,0 | 0,2,1 |   1|   0,0  |0,2|     0|  root|
+|  ----  | ----  |  ----  | ----  |  ----  | ----  |  ----  | ----  |  ----  | ----  |  ----  | ----  |
+|0,0,0    |4.0|    0.0|   -1.0|  1.0|    0.0|   -2.0|  4.0|   2.0| -1.0  |-1.0|  -1.0|
+|0,0,1|    2.0|    4.0|    0.0| -2.0|    0.0|   -1.0|  2.0|   2.0| -1.0|  -1.0|  -1.0|
+|0,0,2|    2.0|    0.0|    4.0|  1.0|   -2.0|    2.0|  2.0|   2.0|  1.0|  -1.0|  -1.0|
+|0,1|     -1.0|   -2.0|    1.0|  4.0|   -1.0|   -1.0| -1.0|  -1.0 |-1.0|  -1.0|  -1.0|
+0,2,0|    2.0|    2.0|    1.0|  1.0|    4.0|   -1.0 | 2.0 |  0.0|  3.0  |-1.0  |-1.0
+0,2,1|    0.0    |2.0  |  0.0| -2.0|    1.0|    4.0|  0.0|   0.0|  3.0|  -1.0 | -1.0|
+1|        4.0   | 0.0|   -1.0|  1.0|    0.0|   -2.0|  4.0 |  2.0| -1.0|  -1.0|  -1.0|
+0,0 |     2.0 |   2.0 |   2.0| -1.0|   -1.0|    0.0|  2.0|  12.0 | 1.0 |  9.0  | 8.0|
+0,2   |   1.0    |1.0 |   0.0|  0.0|    3.0  |  3.0|  1.0 |  3.0  |8.0 |  4.0  | 3.0
+0     |  -1.0|   -1.0|   -1.0| -1.0|   -1.0|   -1.0| -1.0  | 9.0 | 4.0  |24.0 | 23.0|
+root |   -1.0   |-1.0   |-1.0| -1.0|   -1.0 |  -1.0| -1.0 |  8.0 | 3.0|  23.0|  28.0|
+
 
