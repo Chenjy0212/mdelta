@@ -66,11 +66,8 @@ something output! Matrix Node:
 \| 4.0 \|24.0 \| 23.0\| root \| -1.0 \|-1.0 \|-1.0\| -1.0\| -1.0 \|
 -1.0\| -1.0 \| 8.0 \| 3.0\| 23.0\| 28.0\|
 
-.. container::
+| |img|
 
-   ::
-
-      <img src="./image/logoh.png" width="600"/>
 
 |docs| |PyPI - Python Version| |PyPI| |license| |Github Stars|
 
@@ -492,7 +489,6 @@ WeChat Official Accounts
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
 | *Charles_pikachu*
-| |img|
 
 .. |docs| image:: https://img.shields.io/badge/docs-latest-blue
    :target: https://httpsgithubcomcharlespikachudecryptlogin.readthedocs.io/zh/latest/
@@ -504,4 +500,4 @@ WeChat Official Accounts
    :target: https://github.com/Chenjy0212/modelta/blob/main/LICENSE
 .. |Github Stars| image:: https://img.shields.io/github/stars/Chenjy0212?color=faf408&label=github%20stars&logo=github
    :target: https://github.com/Chenjy0212
-.. |img| image:: ./docs/pikachu.jpg
+.. |img| image:: ./image/logoh.png
