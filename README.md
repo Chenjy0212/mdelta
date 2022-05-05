@@ -1,5 +1,5 @@
 <div align=center>
-<img alt="logo" src="./image/logoh.png" width=400 />
+<img alt="logo" src="./image/logoh.png" width=100% height=250/>
 
 [![Documentation Status](https://readthedocs.org/projects/modelta/badge/?version=latest)](https://modelta.readthedocs.io/en/latest/?badge=latest) [![PyPI - Python Version](https://img.shields.io/pypi/pyversions/DecryptLogin?logo=python&labelColor=white)](https://pypi.org/project/modelta/) [![PyPI](https://img.shields.io/pypi/v/DecryptLogin)](https://pypi.org/project/modelta) [![license](https://img.shields.io/github/license/Chenjy0212/modelta.svg)](https://github.com/Chenjy0212/modelta/blob/main/LICENSE)<br>
 [![Github Stars](https://img.shields.io/github/stars/Chenjy0212?color=faf408&label=github%20stars&logo=github)](https://github.com/Chenjy0212) [![Bilibili](https://img.shields.io/badge/dynamic/json?labelColor=FE7398&logo=bilibili&logoColor=white&label=Bilibili&color=00aeec&query=%24.data.totalSubs&url=https%3A%2F%2Fapi.spencerwoo.com%2Fsubstats%2F%3Fsource%3Dbilibili%26queryKey%3D423592635)](https://space.bilibili.com/423592635) [![Zhihu](https://img.shields.io/badge/dynamic/json?color=142026&labelColor=0066ff&logo=zhihu&logoColor=white&label=知乎&query=%24.data.totalSubs&url=https%3A%2F%2Fapi.spencerwoo.com%2Fsubstats%2F%3Fsource%3Dzhihu%26queryKey%3Dxing-ru-yu-yxl)](https://www.zhihu.com/people/xing-ru-yu-yxl)<br>
@@ -12,12 +12,11 @@
 
 # MODELTA
 
-Chen and Yang Lab Multi fork Development cell lineage tree alignment algorithm package and executable program.
-You can get the score matrix through them to analyze the node relationship of the pedigree tree, or you can test the correlation.
-You can star this repository to keep track of the project if it's helpful for you, thank you for your support.
+- Chen and Yang Lab Multi fork Development cell lineage tree alignment algorithm package and executable program.
 
+- You can get the score matrix through them to analyze the node relationship of the pedigree tree, or you can test the correlation.
 
-
+- You can star this repository to keep track of the project if it's helpful for you, thank you for your support.
 
 # Install
 
