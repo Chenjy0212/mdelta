@@ -253,7 +253,7 @@ def scoremat(TreeSeqFile:str,
             Name2TypeFile:str = '',
             Name2TypeFile2:str = '', 
             ScoreDictFile:str = '', 
-            top:int = -1,
+            top:int = 0,
             pv:float = -1.,
             mv:float = 2.,
             Alg:str = 'KM',
@@ -369,7 +369,7 @@ def scoremat(TreeSeqFile:str,
                                                                         Algorithm=Alg,
                                                                         prune=pv,)
     
-    if top == -1: #默认情况下
+    if top == 0: #默认情况下
         T1root_T2root = []
         T1root_T2root.append({'Score':matrix_values[-1][-1],
                             'Root1_label':root1.label, 
@@ -380,7 +380,7 @@ def scoremat(TreeSeqFile:str,
                             'col':root2.node_count()-1})
 
         return({'matrix':mmatrix, 'T1root_T2root':T1root_T2root})
-    elif top > 0:
+    elif top > 0 and top < min(root1.node_count(), root2.node_count()):
 
         def changemat(rac, tracemat, mat):
             for i in tracemat[tuple(rac)]:
@@ -402,7 +402,7 @@ def scoremat(TreeSeqFile:str,
             del_j_index = np.where(mat_tmp==np.max(mat_tmp))[1][0]
             #scorelist.append([np.max(mat_tmp),mat.index[del_i_index],mat.columns[del_j_index]])
             #scorelist.append([np.max(mat_tmp), del_i_index, del_j_index])
-            scorelist.append({'Score':maxscore, 
+            scorelist.append({'Score':maxscore[0], 
                             'Root1_label':lllnode[del_i_index].label, 
                             'Root1_node':lllnode[del_i_index].nodeobj,
                             'Root2_label':llllnode[del_j_index].label, 

@@ -17,256 +17,190 @@
 
 # Install
 
-#### Preparation
+#### Required package
 
-- [Nodejs](https://nodejs.org/en/): Since some of the supported websites need to compile the js code, you should install the nodejs in your computer.
+- [pandas](https://pypi.org/project/pandas/): Score matrix architecture based on dataframe.
+- [numpy](https://pypi.org/project/numpy/): Many computing essential packages.
+- [munkres](https://pypi.org/project/munkres/): An algorithm for finding the maximum value of score matrix dynamic programming
+
+#### Optional package
+
+- [tqdm](https://pypi.org/project/tqdm/): Displays the progress during the calculation phase.
+- [multiprocess](https://pypi.org/project/multiprocess/): When calculating the p value, because it needs to disrupt the original sequence many times and perform multiple calculations, using multiple processes can effectively reduce the waiting time.
 
 #### Pip install
 
 ```sh
-run "pip install DecryptLogin"
+run "pip install modelta"
 ```
 
 #### Source code install
 
 ```sh
 (1) Offline
-Step1: git clone https://github.com/CharlesPikachu/DecryptLogin.git
-Step2: cd DecryptLogin -> run "python setup.py install"
+Step1: git clone https://github.com/Chenjy0212/modelta.git
+Step2: cd modelta -> run "python setup.py install"
 (2) Online
-run "pip install git+https://github.com/CharlesPikachu/DecryptLogin.git@master"
+run "pip install git+https://github.com/Chenjy0212/modelta.git@main"
 ```
+
+# !!! If you are a python coding user:
 
 # Quick Start
 
-
-
-
-
-
-
-## 01 Introduction
-
->pip install -i <https://test.pypi.org/simple/> modelta
-
-Then you can use this function in your Python code. As shown below(**/modelta/test2.py**):
+You can use this package in your Python code. For example, run under Jupiter notebook:
 
 ```python
 import modelta
-modelta.demola()
-print(modelta.scoremat('modelta/ExampleFile/tree.nwk','modelta/ExampleFile/Name2Type.csv','modelta/ExampleFile/tree.nwk','modelta/ExampleFile/Name2Type.csv'))
+from pprint import pprint
+
+example = modelta.scoremat(TreeSeqFile = 'ExampleFile/tree.nwk',
+                       TreeSeqFile2 = 'ExampleFile/tree.nwk',
+                       Name2TypeFile = 'ExampleFile/Name2Type.csv',
+                       Name2TypeFile2 ='ExampleFile/Name2Type.csv',
+                       ScoreDictFile = ''
+                       mv = 2,
+                       top = 0,
+                       notebook = True,
+                       pv = -1,
+                       Tqdm = True,)
+pprint(example)
 ```
 
-## 02 Result
-
-something output!
-Matrix Node: 100%|███████████████████████████████████████████████████████████████████████████████████████| 121/121 [00:00<00:00, 20213.92it/s]
-
-| Root2(col) & Root1(row) | 0,0,0 | 0,0,1 | 0,0,2 | 0,1  | 0,2,0 | 0,2,1 | 1    | 0,0  | 0,2  | 0    | root |
-| ----------------------- | ----- | ----- | ----- | ---- | ----- | ----- | ---- | ---- | ---- | ---- | ---- |
-| 0,0,0                   | 4.0   | 0.0   | -1.0  | 1.0  | 0.0   | -2.0  | 4.0  | 2.0  | -1.0 | -1.0 | -1.0 |
-| 0,0,1                   | 2.0   | 4.0   | 0.0   | -2.0 | 0.0   | -1.0  | 2.0  | 2.0  | -1.0 | -1.0 | -1.0 |
-| 0,0,2                   | 2.0   | 0.0   | 4.0   | 1.0  | -2.0  | 2.0   | 2.0  | 2.0  | 1.0  | -1.0 | -1.0 |
-| 0,1                     | -1.0  | -2.0  | 1.0   | 4.0  | -1.0  | -1.0  | -1.0 | -1.0 | -1.0 | -1.0 | -1.0 |
-| 0,2,0                   | 2.0   | 2.0   | 1.0   | 1.0  | 4.0   | -1.0  | 2.0  | 0.0  | 3.0  | -1.0 | -1.0 |
-| 0,2,1                   | 0.0   | 2.0   | 0.0   | -2.0 | 1.0   | 4.0   | 0.0  | 0.0  | 3.0  | -1.0 | -1.0 |
-| 1                       | 4.0   | 0.0   | -1.0  | 1.0  | 0.0   | -2.0  | 4.0  | 2.0  | -1.0 | -1.0 | -1.0 |
-| 0,0                     | 2.0   | 2.0   | 2.0   | -1.0 | -1.0  | 0.0   | 2.0  | 12.0 | 1.0  | 9.0  | 8.0  |
-| 0,2                     | 1.0   | 1.0   | 0.0   | 0.0  | 3.0   | 3.0   | 1.0  | 3.0  | 8.0  | 4.0  | 3.0  |
-| 0                       | -1.0  | -1.0  | -1.0  | -1.0 | -1.0  | -1.0  | -1.0 | 9.0  | 4.0  | 24.0 | 23.0 |
-| root                    | -1.0  | -1.0  | -1.0  | -1.0 | -1.0  | -1.0  | -1.0 | 8.0  | 3.0  | 23.0 | 28.0 |
-
-
-
-[![Documentation Status](https://readthedocs.org/projects/modelta/badge/?version=latest)](https://modelta.readthedocs.io/en/latest/?badge=latest)
-[![PyPI - Python Version](https://img.shields.io/pypi/pyversions/DecryptLogin)](https://test.pypi.org/project/modelta/)
-[![PyPI](https://img.shields.io/pypi/v/DecryptLogin)](https://pypi.org/project/DecryptLogin)
-[![license](https://img.shields.io/github/license/Chenjy0212/modelta.svg)](https://github.com/Chenjy0212/modelta/blob/main/LICENSE)
-[![Github Stars](https://img.shields.io/github/stars/Chenjy0212?color=faf408&label=github%20stars&logo=github)](https://github.com/Chenjy0212)
-
-Documents-CN:  <https://httpsgithubcomcharlespikachudecryptlogin.readthedocs.io/zh/latest/>
-
-Documents-EN: <https://httpsgithubcomcharlespikachudecryptlogin.readthedocs.io/en/latest/>
-
-# DecryptLogin
-
+#### Result
 ```
-APIs for loginning some websites by using requests.
-You can star this repository to keep track of the project if it's helpful for you, thank you for your support.
-```
+Matrix Node: 100%
+121/121 [00:00<00:00, 2573.11it/s]
 
-# Statements
-
-```
-This repo is created for learning python.
-If I find that anyone leverage this project in an illegal way, I will delete this project immediately.
-
-本项目仅供python爱好者学习使用, 若作者发现该项目以任何不正当方式被使用, 将立即删除该项目。
-希望大家合理利用该项目🙂
+{'TopScoreList': [{'Root1_label': 'root',
+                   'Root1_node': '(((a,b,c),d,(e,f)),a)',
+                   'Root2_label': 'root',
+                   'Root2_node': '(((a,b,c),d,(e,f)),a)',
+                   'Score': 14.0,
+                   'col': 10,
+                   'row': 10},
+                  {'Root1_label': '0',
+                   'Root1_node': '((a,b,c),d,(e,f))',
+                   'Root2_label': 'root',
+                   'Root2_node': '(((a,b,c),d,(e,f)),a)',
+                   'Score': 11.0,
+                   'col': 10,
+                   'row': 9},
+                  {'Root1_label': 'root',
+                   'Root1_node': '(((a,b,c),d,(e,f)),a)',
+                   'Root2_label': '0',
+                   'Root2_node': '((a,b,c),d,(e,f))',
+                   'Score': 11.0,
+                   'col': 9,
+                   'row': 10}],
+ 'matrix': Root2  0,0,0  0,0,1  0,0,2  0,1  0,2,0  0,2,1    1  0,0  0,2     0  root
+Root1                                                                   
+0,0,0    2.0   -1.0   -1.0 -1.0   -1.0   -1.0  2.0  0.0 -1.0  -1.0  -1.0
+0,0,1   -1.0    2.0   -1.0 -1.0   -1.0   -1.0 -1.0  0.0 -1.0  -1.0  -1.0
+0,0,2   -1.0   -1.0    2.0 -1.0   -1.0   -1.0 -1.0  0.0 -1.0  -1.0  -1.0
+0,1     -1.0   -1.0   -1.0  2.0   -1.0   -1.0 -1.0 -1.0 -1.0  -1.0  -1.0
+0,2,0   -1.0   -1.0   -1.0 -1.0    2.0   -1.0 -1.0 -1.0  1.0  -1.0  -1.0
+0,2,1   -1.0   -1.0   -1.0 -1.0   -1.0    2.0 -1.0 -1.0  1.0  -1.0  -1.0
+1        2.0   -1.0   -1.0 -1.0   -1.0   -1.0  2.0  0.0 -1.0  -1.0  -1.0
+0,0      0.0    0.0    0.0 -1.0   -1.0   -1.0  0.0  6.0 -2.0   3.0   2.0
+0,2     -1.0   -1.0   -1.0 -1.0    1.0    1.0 -1.0 -2.0  4.0   0.0  -1.0
+0       -1.0   -1.0   -1.0 -1.0   -1.0   -1.0 -1.0  3.0  0.0  12.0  11.0
+root    -1.0   -1.0   -1.0 -1.0   -1.0   -1.0 -1.0  2.0 -1.0  11.0  14.0}
 ```
 
-# Support List
+#### Parameter analysis
 
-|    Websites     | PC Mode | Mobile Mode | ScanQR Mode |   Chinese Name    |
-| :-------------: | :-----: | :---------: | :---------: | :---------------: |
-|      weibo      |    ✓    |      ✓      |      ✓      |     新浪微博      |
-|     douban      |    ✓    |      ✗      |      ✓      |       豆瓣        |
-|     github      |    ✓    |      ✗      |      ✗      |      Github       |
-|    music163     |    ✓    |      ✗      |      ✓      |    网易云音乐     |
-|     zt12306     |    ✓    |      ✗      |      ✓      |   中国铁路12306   |
-|     QQZone      |    ✗    |      ✗      |      ✓      |      QQ空间       |
-|      QQQun      |    ✗    |      ✗      |      ✓      |       QQ群        |
-|      QQId       |    ✗    |      ✗      |      ✓      |    我的QQ中心     |
-|      zhihu      |    ✓    |      ✗      |      ✓      |       知乎        |
-|    bilibili     |    ✓    |      ✓      |      ✓      |        B站        |
-|     toutiao     |    ✗    |      ✗      |      ✓      |     今日头条      |
-|     taobao      |    ✗    |      ✗      |      ✓      |       淘宝        |
-|    jingdong     |    ✗    |      ✗      |      ✓      |       京东        |
-|      ifeng      |    ✓    |      ✗      |      ✗      |      凤凰网       |
-|      sohu       |    ✓    |      ✓      |      ✗      |       搜狐        |
-|    zgconline    |    ✓    |      ✗      |      ✗      |    中关村在线     |
-|      lagou      |    ✓    |      ✗      |      ✗      |      拉勾网       |
-|     twitter     |    ✓    |      ✓      |      ✗      |       推特        |
-|    eSurfing     |    ✗    |      ✗      |      ✓      |       天翼        |
-|     renren      |    ✓    |      ✗      |      ✗      |      人人网       |
-|    w3cschool    |    ✓    |      ✗      |      ✗      | W3Cschool(编程狮) |
-|      fishc      |    ✓    |      ✗      |      ✗      |      鱼C论坛      |
-|     youdao      |    ✓    |      ✗      |      ✗      |       有道        |
-|    baidupan     |    ✓    |      ✗      |      ✗      |     百度网盘      |
-|  stackoverflow  |    ✓    |      ✗      |      ✗      |   Stackoverflow   |
-|     codalab     |    ✓    |      ✗      |      ✗      |      CodaLab      |
-|      pypi       |    ✓    |      ✗      |      ✗      |       PyPi        |
-|      douyu      |    ✗    |      ✗      |      ✓      |     斗鱼直播      |
-|      migu       |    ✓    |      ✗      |      ✗      |     咪咕音乐      |
-|      qunar      |    ✓    |      ✗      |      ✗      |    去哪儿旅行     |
-|     mieshop     |    ✓    |      ✗      |      ✗      |     小米商城      |
-|    mpweixin     |    ✓    |      ✗      |      ✗      |    微信公众号     |
-|   baidutieba    |    ✗    |      ✗      |      ✓      |     百度贴吧      |
-| dazhongdianping |    ✗    |      ✗      |      ✓      |     大众点评      |
-|   jianguoyun    |    ✓    |      ✗      |      ✗      |      坚果云       |
-|    cloud189     |    ✓    |      ✓      |      ✗      |     天翼云盘      |
-|     qqmusic     |    ✗    |      ✗      |      ✓      |      QQ音乐       |
-|    ximalaya     |    ✗    |      ✗      |      ✓      |     喜马拉雅      |
-|   icourse163    |    ✗    |      ✓      |      ✗      |   中国大学MOOC    |
-|  xiaomihealth   |    ✗    |      ✓      |      ✗      |     小米运动      |
-|  tencentvideo   |    ✗    |      ✗      |      ✓      |     腾讯视频      |
+**If the parameter has an `*`, it is required; otherwise, it is optional**
 
-# Practice with DecryptLogin
+- `TreeSeqFile` & `TreeSeqFile2`: [*path/filename* `*`] Cell lineage tree file with branch length information removed. The format of reference documents is as follows: [ExampleFile/tree.nwk](https://github.com/Chenjy0212/modelta/blob/main/modelta/ExampleFile/tree.nwk)
+- `mv`: [*float* and `default` = *2.*] The matching score between the same nodes, which is often used when the parameter `ScoreDictFile` is the default.
+- `pv`: [*float* and `default` = *-1.*] The prune score between the different nodes.
+- `top`: [*int > 0* and `default` = *0*] Select the top few meaningful scores in the score matrix. if it is default:
 
-|          Project           |                        Introduction                        |                             code                             |           in Chinese            |
-| :------------------------: | :--------------------------------------------------------: | :----------------------------------------------------------: | :-----------------------------: |
-|        weiboMonitor        | [click](https://mp.weixin.qq.com/s/uOT1cGqXkOq-Hdc8TVnglg) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/weiboMonitor) |            微博监控             |
-|          QQReport          | [click](https://mp.weixin.qq.com/s/dsVtEp_TFeyeSAAUn1zFEw) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/QQReports) |       生成QQ个人专属报告        |
-| bilibiliDownloadUserVideos | [click](https://mp.weixin.qq.com/s/GaVW4_nbAaO0QvphI7QgnA) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/bilibiliDownloadUserVideos) |    下载B站指定UP主的所有视频    |
-| NeteaseSongListDownloader  | [click](https://mp.weixin.qq.com/s/_82U7luG6jmV-xb8-Qkiew) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/NeteaseSongListDownloader) |      网易云个人歌单下载器       |
-|  NeteaseListenLeaderboard  | [click](https://mp.weixin.qq.com/s/Wlf1a82oACc9N7zGezcy8Q) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/NeteaseListenLeaderboard) |      网易云个人听歌排行榜       |
-|      userWeiboSpider       | [click](https://mp.weixin.qq.com/s/-3BDTZAE1x7nfCLNq2mFBw) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/userWeiboSpider) | 下载指定微博用户的所有微博数据  |
-|       NeteaseSignin        | [click](https://mp.weixin.qq.com/s/8d7smUSzW2ds1ypZq-yeFw) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/NeteaseSignin) |       网易云音乐自动签到        |
-|         weiboEmoji         | [click](https://mp.weixin.qq.com/s/QiPm4gyE8i5amR5gB3IbBA) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/weiboEmoji) |         微博表情包爬取          |
-|        weiboSender         | [click](https://mp.weixin.qq.com/s/_aIY-iVj3xetfHQyMxflkg) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/weiboSender) |         大吼一声发微博          |
-|          tbgoods           | [click](https://mp.weixin.qq.com/s/NhK9eeWNXv_wPnolccRR-g) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/tbgoods) |       淘宝商品数据小爬虫        |
-|          jdgoods           | [click](https://mp.weixin.qq.com/s/LXheJveR248ZW4SP5F6fjw) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/jdgoods) |       京东商品数据小爬虫        |
-|        delallweibos        | [click](https://mp.weixin.qq.com/s/E5Erg10FvyutEKaB_JGufA) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/delallweibos) |          批量删除微博           |
-|         ClearQzone         | [click](https://mp.weixin.qq.com/s/Fj9MQXXRZ8wuKiX3Tytx8A) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/ClearQzone) |       批量删除QQ空间说说        |
-|      NeteaseEveryday       | [click](https://mp.weixin.qq.com/s/tliFa5CYVEirMEyUj0jPbg) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/NeteaseEveryday) |   在终端看网易云每日歌曲推荐    |
-|    NeteaseClickPlaylist    | [click](https://mp.weixin.qq.com/s/BpoO55I-jxAGO_Vv32khlA) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/NeteaseClickPlaylist) |     网易云音乐刷歌曲播放量      |
-|       cloud189signin       | [click](https://mp.weixin.qq.com/s/tSLTSKDMzMAkP2deCjkanA) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/cloud189signin) |      天翼云盘自动签到+抽奖      |
-|           moocdl           | [click](https://mp.weixin.qq.com/s/KsXU-pMvT8GzpPWVpcWIOA) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/moocdl) |       中国大学MOOC下载器        |
-|    modifymihealthsteps     | [click](https://mp.weixin.qq.com/s/TQLM9GIW50UWAsKoXb7pzQ) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/modifymihealthsteps) |      修改小米运动中的步数       |
-|         taobaosnap         | [click](https://mp.weixin.qq.com/s/vCZYtynHtQAOuQJHvjhpWA) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/taobaosnap) |          淘宝抢购脚本           |
-|        jingdongsnap        | [click](https://mp.weixin.qq.com/s/-H8bwuUIPDi41d09tTlvRw) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/jingdongsnap) |          京东抢购脚本           |
-|     bilibiliupmonitor      | [click](https://mp.weixin.qq.com/s/KjJLPcqHecK8T8LDVesxJQ) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/bilibiliupmonitor) |           B站UP主监控           |
-|      bilibililottery       | [click](https://mp.weixin.qq.com/s/7kGjT48AOG_zB1v-cODgVw) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/bilibililottery) | B站监控关注的UP主并自动转发抽奖 |
-|         weibowater         | [click](https://mp.weixin.qq.com/s/Avf169tvDNRLrgmrNj8jUw) | [click](https://github.com/CharlesPikachu/DecryptLogin/tree/master/examples/weibowater) |            微博水军             |
+```
+{'T1root_T2root': [{'Root1_label': 'root',
+                    'Root1_node': '(((a,b,c),d,(e,f)),a)',
+                    'Root2_label': 'root',
+                    'Root2_node': '(((a,b,c),d,(e,f)),a)',
+                    'Score': 14.0,
+                    'col': 10,
+                    'row': 10}],                                                    
+```
 
-# 
+- `notebook`: [*bool* and `default`=*False*] Is it written and run in the jupyter notebook environment.
+- `Tqdm`: [*bool* and `default`=*True*] Whether to display the operation progress bar.
+
+**if Qualitative calculation:**
+
+- `Name2TypeFile` & `Name2TypeFile2`: [*path/filename* `*`] Convert tree node name to type. The format of reference documents is as follows: [ExampleFile/Name2Type.csv](https://github.com/Chenjy0212/modelta/blob/main/modelta/ExampleFile/Name2Type.csv)
+- `ScoreDictFile`: [*path/filename* and `default`=''] Defines the score of matches between nodes. The format of reference documents is as follows: [ExampleFile/socrefile.csv](https://github.com/Chenjy0212/modelta/blob/main/modelta/ExampleFile/scorefile.csv)
+
+**If Quantitative calculation**
+
+- `ScoreDictFile`: [*path/filename* `*`] Defines the score of matches between nodes. The format of reference documents is as follows: [ExampleFile/Qscorefile.csv](https://github.com/Chenjy0212/modelta/blob/main/modelta/ExampleFile/Qscorefile.csv)
+- `Name2TypeFile` & `Name2TypeFile2`: [*path/filename* or *No input*] Convert tree node name to type. The format of reference documents is as follows: [ExampleFile/Name2Type.csv](https://github.com/Chenjy0212/modelta/blob/main/modelta/ExampleFile/Name2Type.csv)
+
+# P-value calculation
+
+```
+modelta.pvalue(times = 3, 
+               topscorelist = example['TopScoreList'], 
+               ScoreDictFile='',
+               CPUs = 50, 
+               mv = 2, 
+               pv = -1)
+```
+#### Result
+
+```
+ Pvalue : 100%|██████████| 3/3 [00:00<00:00,  4.05it/s]
+ Pvalue : 100%|██████████| 3/3 [00:00<00:00,  4.38it/s]
+ Pvalue : 100%|██████████| 3/3 [00:00<00:00,  4.45it/s]
+[[3.0, 4.0, 0.0, 14.0], [4.0, 5.0, 3.0, 11.0], [5.0, 0.0, 1.0, 11.0]]
+```
+The returned results represent `times` matching scores corresponding to the `top` maximum values
+
+#### Parameter analysis
+
+**If the parameter has an `*`, it is required; otherwise, it is optional**
+
+- `times`: [*int > 0* `*`] The number of times the original sequence needs to be disrupted, such as:
 
 ```python
-from DecryptLogin import login
-
-lg = login.Login()
-infos_return, session = lg.douban()
-infos_return, session = lg.github(username[email], password)
-infos_return, session = lg.weibo()
-infos_return, session = lg.music163(username[telephone/email], password)
-infos_return, session = lg.zt12306(username[telephone], password)
-infos_return, session = lg.QQZone()
-infos_return, session = lg.QQQun()
-infos_return, session = lg.QQId()
-infos_return, session = lg.zhihu()
-infos_return, session = lg.bilibili()
-infos_return, session = lg.toutiao()
-infos_return, session = lg.taobao()
-infos_return, session = lg.jingdong()
-infos_return, session = lg.ifeng(username, password)
-infos_return, session = lg.sohu(username, password)
-infos_return, session = lg.zgconline(username, password)
-infos_return, session = lg.lagou(username, password)
-infos_return, session = lg.twitter(username, password)
-infos_return, session = lg.eSurfing()
-infos_return, session = lg.renren(username, password)
-infos_return, session = lg.w3cschool(username, password)
-infos_return, session = lg.fishc(username, password)
-infos_return, session = lg.youdao(username, password)
-infos_return, session = lg.baidupan(username, password)
-infos_return, session = lg.stackoverflow(username, password)
-infos_return, session = lg.codalab(username, password)
-infos_return, session = lg.pypi(username, password)
-infos_return, session = lg.douyu()
-infos_return, session = lg.migu(username, password)
-infos_return, session = lg.qunar(username, password)
-infos_return, session = lg.mieshop(username, password)
-infos_return, session = lg.mpweixin(username, password)
-infos_return, session = lg.baidutieba()
-infos_return, session = lg.dazhongdianping()
-infos_return, session = lg.jianguoyun(username, password)
-infos_return, session = lg.cloud189(username, password)
-infos_return, session = lg.qqmusic()
-infos_return, session = lg.ximalaya()
-infos_return, session = lg.icourse163(username, password)
-infos_return, session = lg.xiaomihealth(username, password)
-infos_return, session = lg.tencentvideo()
+times = 3 #Randomly disrupt the nodes, but the structure remains unchanged
+(((a,b,c),d,(e,f)),a) -> (((a,b,c),d,(e,f)),a)
+                      -> (((a,c,d),b,(a,f)),e)
+                      -> (((e,f,a),d,(b,c)),a)
 ```
 
-# Thanks List
+- `topscorelist`: [*example['TopScoreList']* `*`] The input parameter is the maximum value sequence obtained earlier.
+- `CPUs`: [*int > 0* and `default` = *50*] Multi process computing can greatly reduce the waiting time. The default process pool is 50, but limited by local computer resources, it can reach the maximum number of local CPU cores - 1.
+- `mv` & `pv` & `notebook` parameters have been described in detail before
 
-|                    Author                    |    Time    |                  Contribution                   |
-| :------------------------------------------: | :--------: | :---------------------------------------------: |
-| @[skygongque](https://github.com/skygongque) | 2020-02-13 | add verification code processing in (weibo, pc) |
+# !!! Elif you're not a regular programmer:
+
+# Quick Start
+
+We provide executable files, which can be obtained by inputting corresponding parameters at the terminal
+
+```
+
+```
 
 # Citation
 
 If you use this project in your research, please cite this project.
 
 ```
-@misc{decryptlogin2020,
-    author = {Zhenchao Jin},
-    title = {DecryptLogin: APIs for loginning some websites by using requests},
-    year = {2020},
+@misc{modelta2022,
+    author = {Jingyu Chen},
+    title = {MODELTA: Multi fork Development cell lineage tree alignment},
+    year = {2022},
     publisher = {GitHub},
     journal = {GitHub repository},
-    howpublished = {\url{https://github.com/CharlesPikachu/DecryptLogin}},
+    howpublished = {\url{https://github.com/Chenjy0212/modelta}},
 }
 ```
-
-# Projects in Charles_pikachu
-
-- [Games](https://github.com/CharlesPikachu/Games): Create interesting games by pure python.
-- [DecryptLogin](https://github.com/CharlesPikachu/DecryptLogin): APIs for loginning some websites by using requests.
-- [Musicdl](https://github.com/CharlesPikachu/musicdl): A lightweight music downloader written by pure python.
-- [Videodl](https://github.com/CharlesPikachu/videodl): A lightweight video downloader written by pure python.
-- [Pytools](https://github.com/CharlesPikachu/pytools): Some useful tools written by pure python.
-- [PikachuWeChat](https://github.com/CharlesPikachu/pikachuwechat): Play WeChat with itchat-uos.
-- [Pydrawing](https://github.com/CharlesPikachu/pydrawing): Beautify your image or video.
-- [ImageCompressor](https://github.com/CharlesPikachu/imagecompressor): Image compressors written by pure python.
-- [FreeProxy](https://github.com/CharlesPikachu/freeproxy): Collecting free proxies from internet.
-- [Paperdl](https://github.com/CharlesPikachu/paperdl): Search and download paper from specific websites.
-- [Sciogovterminal](https://github.com/CharlesPikachu/sciogovterminal): Browse "The State Council Information Office of the People's Republic of China" in the terminal.
-- [CodeFree](https://github.com/CharlesPikachu/codefree): Make no code a reality.
-- [DeepLearningToys](https://github.com/CharlesPikachu/deeplearningtoys): Some deep learning toys implemented in pytorch.
-- [DataAnalysis](https://github.com/CharlesPikachu/dataanalysis): Some data analysis projects in charles_pikachu.
-- [Imagedl](https://github.com/CharlesPikachu/imagedl): Search and download images from specific websites.
-- [Pytoydl](https://github.com/CharlesPikachu/pytoydl): A toy deep learning framework built upon numpy.
 
 # Introduction
 <div align=center>
