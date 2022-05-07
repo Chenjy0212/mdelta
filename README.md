@@ -135,10 +135,33 @@ root    -1.0   -1.0   -1.0 -1.0   -1.0   -1.0 -1.0  2.0 -1.0  11.0  14.0}
 - `Name2TypeFile` & `Name2TypeFile2`: [*path/filename* `*`] Convert tree node name to type. The format of reference documents is as follows: [ExampleFile/Name2Type.csv](https://github.com/Chenjy0212/modelta/blob/main/modelta/ExampleFile/Name2Type.csv)
 - `ScoreDictFile`: [*path/filename* and `default`=''] Defines the score of matches between nodes. The format of reference documents is as follows: [ExampleFile/socrefile.csv](https://github.com/Chenjy0212/modelta/blob/main/modelta/ExampleFile/scorefile.csv)
 
+```
+The matching score between nodes is determined according to the "ScoreDictFile" file.
+If the file is empty, only the same nodes are taken for pairing, and the default matching score is 2 (float)
+
+node: a <-> a = 2.(custom)
+      b <-> b = 3.(custom)
+      a <-> b = ?(custom)
+The higher the score, the stronger the similarity
+```
+
 **If Quantitative calculation**
 
 - `ScoreDictFile`: [*path/filename* `*`] Defines the score of matches between nodes. The format of reference documents is as follows: [ExampleFile/Qscorefile.csv](https://github.com/Chenjy0212/modelta/blob/main/modelta/ExampleFile/Qscorefile.csv)
 - `Name2TypeFile` & `Name2TypeFile2`: [*path/filename* or *No input*] Convert tree node name to type. The format of reference documents is as follows: [ExampleFile/Name2Type.csv](https://github.com/Chenjy0212/modelta/blob/main/modelta/ExampleFile/Name2Type.csv)
+
+```
+The matching score between nodes is determined according to the "ScoreDictFile" file.
+The file is required. You can modify the score of the same node by modifying parameter "mv"
+
+   Gene0  Gene1  Gene2  
+a    1      2      3  
+b    2      3      4
+
+node: (1-2)**2 + (2-3)**2 + (3-4)**2 #Euclidean distance
+Then get the final score according to the smoothing function. 
+The lower the score, the stronger the similarity
+```
 
 # P-value calculation
 
@@ -179,7 +202,7 @@ times = 3 #Randomly disrupt the nodes, but the structure remains unchanged
 
 # !!! Elif you're not a regular programmer:
 
-# Quick Start
+## Quick Start
 
 We provide executable files, which can be obtained by inputting corresponding parameters at the terminal
 

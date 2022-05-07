@@ -7,10 +7,6 @@ import math
 # 读取 .nwk类文件并把谱系树中的节点名称转换为类型
 # 例如   (a1,b7); ---> (a,b);
 def ReadTreeSeq_Name2Type(TreeSeqFilePath, Name2TypeFilePath):
-    if TreeSeqFilePath[-1] == '/' or Name2TypeFilePath[-1] == '/':
-        print('文件夹路径末尾不能加/')
-        return
-
     file1= open(TreeSeqFilePath,encoding='utf-8') #读取到文本的所有内容
     content=file1.read()
     #print(content)
@@ -29,6 +25,12 @@ def ReadTreeSeq_Name2Type(TreeSeqFilePath, Name2TypeFilePath):
             #print(content)
         else:
             break
+    #print(content)
+    return content.replace(';', '')
+
+def ReadTreeSeq(TreeSeqFilePath):
+    file1= open(TreeSeqFilePath,encoding='utf-8') #读取到文本的所有内容
+    content=file1.read()
     #print(content)
     return content.replace(';', '')
 

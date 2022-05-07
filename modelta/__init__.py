@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*- 
 
+from tkinter.tix import Tree
 from numpy import NaN
 from .ReadFile import *
 from .mytest import *
@@ -18,7 +19,7 @@ class MultiTree:
         self.right = None
         self.level = level
         self.label = label
-    # 鍓嶅簭閬嶅巻,鑾峰彇鎸夌収灞傜骇鎺掑簭鐨勫叏鑺傜偣搴忓垪瀵? [node:level]
+    # 前序遍历,获取按照层级排序的全节点序列对 [node:level]
     def nodes(self,ll={}):
         lll= ll 
         if self.nodeobj is not None:
@@ -34,7 +35,7 @@ class MultiTree:
         for i in lll: 
             llist[i[1]].append(i[0])
         return llist
-    # 鍚庡簭閬嶅巻_寰楀埌nodeobj:level瀵?
+    # 后序遍历_得到nodeobj:level对
     def postorder(self):
         if self.left is not None:
             self.left.postorder()
@@ -42,7 +43,7 @@ class MultiTree:
             self.right.postorder()
         if self.nodeobj is not None:
             print(self.nodeobj,' Level:',self.level,' Label:',self.label)
-    # 鍓嶅簭閬嶅巻_寰楀埌nodeobj:level瀵?
+    # 前序遍历_得到nodeobj:level对
     def preorder(self):
         if self.nodeobj is not None:
             print(self.nodeobj,' Level:',self.level,' Label:',self.label)
@@ -50,44 +51,44 @@ class MultiTree:
             self.left.preorder()
         if self.right is not None:
             self.right.preorder()
-    # 灞傚簭閬嶅巻
+    # 层序遍历
     def levelorder(self):
-        # 杩斿洖鏌愪釜鑺傜偣鐨勫乏瀛╁瓙
+        # 返回某个节点的左孩子
         def LChild_Of_Node(node):
             return node.left if node.left is not None else None
-        # 杩斿洖鏌愪釜鑺傜偣鐨勫彸瀛╁瓙
+        # 返回某个节点的右孩子
         def RChild_Of_Node(node):
             return node.right if node.right is not None else None
-        # 灞傚簭閬嶅巻鍒楄〃
+        # 层序遍历列表
         level_order = []
-        # 鏄惁娣诲姞鏍硅妭鐐逛腑鐨勬暟鎹?
+        # 是否添加根节点中的数据
         if self.nodeobj is not None:
             level_order.append([self])
-        # 浜屽弶鏍戠殑楂樺害
+        # 二叉树的高度
         height = self.height()
         if height >= 1:
-            # 瀵圭浜屽眰鍙婂叾浠ュ悗鐨勫眰鏁拌繘琛屾搷浣?, 鍦╨evel_order涓坊鍔犺妭鐐硅€屼笉鏄暟鎹?
+            # 对第二层及其以后的层数进行操作, 在level_order中添加节点而不是数据
             for _ in range(2, height + 1):
                 level = []  # 璇ュ眰鐨勮妭鐐?
                 for node in level_order[-1]:
-                    # 濡傛灉宸﹀瀛愰潪绌猴紝鍒欐坊鍔犲乏瀛╁瓙
+                    # 如果左孩子非空，则添加左孩子
                     if LChild_Of_Node(node):
                         level.append(LChild_Of_Node(node))
-                    # 濡傛灉鍙冲瀛愰潪绌猴紝鍒欐坊鍔犲彸瀛╁瓙
+                    # 如果右孩子非空，则添加右孩子
                     if RChild_Of_Node(node):
                         level.append(RChild_Of_Node(node))
-                # 濡傛灉璇ュ眰闈炵┖锛屽垯娣诲姞璇ュ眰
+                # 如果该层非空，则添加该层
                 if level:
                     level_order.append(level)
 
-            # 鍙栧嚭姣忓眰涓殑鏁版嵁
-            for i in range(0, height):  # 灞傛暟
+             # 取出每层中的数据
+            for i in range(0, height):  # 层数
                 for index in range(len(level_order[i])):
                     level_order[i][index] = level_order[i][index].nodeobj
         return level_order
-    # 浜屽弶鏍戠殑楂樺害
+    # 二叉树的高度
     def height(self):
-        # 绌虹殑鏍戦珮搴︿负0, 鍙湁root鑺傜偣鐨勬爲楂樺害涓?1
+        # 空的树高度为0, 只有root节点的树高度为1
         if self.nodeobj is None:
             return 0
         elif self.left is None and self.right is None:
@@ -98,7 +99,7 @@ class MultiTree:
             return 1 + self.left.height()
         else:
             return 1 + max(self.left.height(), self.right.height())
-    # 鍘熸潵鐨勫鍙夋爲鐨勫彾瀛愯妭鐐?
+    # 原来的多叉树的叶子节点
     def leaves(self,ll=[]):
         lll = ll
         if self.nodeobj is None:
@@ -116,12 +117,12 @@ class MultiTree:
             self.left.leaves(lll)
             self.right.leaves(lll)
         return lll
-    #鐢熸垚鏍?
+    #生成树
     def CreatTree(self):
-        if(self.nodeobj[0] == '('): #瀛樺湪鎷彿鎰忓懗鐫€杩樻病杈惧埌鍙跺瓙缁撶偣
+        if(self.nodeobj[0] == '('): #存在括号意味着还没达到叶子结点
             node_list = []
-            brackets_num = 0 #鎷彿涓暟
-            node_num = 0 #鑺傜偣搴忓彿
+            brackets_num = 0 #括号个数
+            node_num = 0 #节点序号
             node_tmp = ''
             for i in self.nodeobj[1:-1]:
                 if i == '(':
@@ -137,13 +138,13 @@ class MultiTree:
                 else:
                     node_tmp += i
             node_list.append(node_tmp)   
-            #print(node_list)    #鏌ョ湅鎷嗗垎鍚庣殑鑺傜偣搴忓垪
+            #print(node_list)    #查看拆分后的节点序列
             self_tmp = self
             for index,item in enumerate(node_list):
                 if index == 0:
-                #绗竴涓瓙鑺傜偣閮芥槸鐖惰妭鐐圭殑宸﹁妭鐐?
-                #鍚庣画瀛愯妭鐐瑰氨鏄笂涓€涓瓙鑺傜偣鐨勫彸鑺傜偣 
-                #璧嬩簣label
+                #第一个子节点都是父节点的左节点
+                #后续子节点就是上一个子节点的右节点 
+                #赋予label
                     label = str(index) if self.label == 'root' else self_tmp.label+','+str(index)    
                     self.left = MultiTree(item,label=label)
                     self = self.left
@@ -153,17 +154,17 @@ class MultiTree:
                     self.right = MultiTree(item,label=label)
                     self = self.right
                     self.CreatTree()
-    #璧嬪眰宸﹀瓙鏍戝悗搴忛亶鍘嗘壘鍑烘渶澶у眰绾
+    #赋层左子树后序遍历找出最大层级d
     def Posorder_Max_Level(self):
         level = self.level;
         while self.right:
-            #鏈夊彸瀛愭爲灏辨槸鏈夊厔寮熺粨鐐?
+            #有右子树就是有兄弟结点
             level = max(level, self.right.level)
             self = self.right
         return level
-    #璧嬩簣灞傜骇level
+    #赋予层级level
     def Level(self):
-        if self.left == None: #鍙跺瓙鑺傜偣
+        if self.left == None: #叶子节点
             self.level = 0
         else:
             self.level = self.left.Posorder_Max_Level()+1
@@ -174,7 +175,7 @@ class MultiTree:
             self.right.Postorder_Level()
         if self.nodeobj is not None:
             self.Level()
-    #鍙跺瓙鑺傜偣涓暟,闇€瑕佺殑鏄妭鐐逛笅鐨勫乏鑺傜偣鎵嶆纭?
+    #叶子节点个数,需要的是节点下的左节点才正确
     def leaf_count(self,flag=1):
         if self is None:
             return 0
@@ -193,7 +194,7 @@ class MultiTree:
         else:
             return self.left.leaf_count(0) + self.right.leaf_count(0)
         
-    #鎬昏妭鐐逛釜鏁?
+    #总节点个数
     def node_count(self):
         if self is None:
             return 0
@@ -207,7 +208,7 @@ class MultiTree:
             return 1 + self.left.node_count()
         #else:
             #return self.left.node_count()+ self.right.node_count()
-    #鑾峰彇褰撳墠鑺傜偣涓€绾у瓙鑺傜偣涓暟
+    #获取当前节点一级子节点个数
     def son_count(self):
         self_tmp = self
         son_num = 0
@@ -222,7 +223,7 @@ class MultiTree:
                 self_tmp = self_tmp.right
                 son_num += 1
         return son_num    
-    #鑾峰彇褰撳墠鑺傜偣涓€绾у瓙鑺傜偣self
+    #获取当前节点一级子节点self
     def son(self):
         self_tmp = self
         son_tmp = []
@@ -238,7 +239,7 @@ class MultiTree:
                 self_tmp = self_tmp.right
                 son_tmp.append(self_tmp)
         return son_tmp
-    # 涓簭閬嶅巻锛屽緱鍒扮敓鎴愭爲鏁版嵁
+    # 中序遍历，得到生成树数据
     def inorder(self,data=[]):
         if self.left is not None:
             self.left.inorder(data)
@@ -261,14 +262,33 @@ def scoremat(TreeSeqFile:str,
             notebook:bool = False):
     if Name2TypeFile != '':
         TreeSeqType = ReadTreeSeq_Name2Type(TreeSeqFile,Name2TypeFile)
+        TreeSeqOri = ReadTreeSeq(TreeSeqFile)
+    else:
+        TreeSeqType = ReadTreeSeq(TreeSeqFile)
+        TreeSeqOri = ReadTreeSeq(TreeSeqFile)
+
     if Name2TypeFile2 != '':
         TreeSeqType2 = ReadTreeSeq_Name2Type(TreeSeqFile2,Name2TypeFile2)
+        TreeSeqOri2 = ReadTreeSeq(TreeSeqFile2)
+    else:
+        TreeSeqType2 = ReadTreeSeq(TreeSeqFile2)
+        TreeSeqOri2 = ReadTreeSeq(TreeSeqFile2)
+
     root1 = MultiTree(TreeSeqType)
     root2 = MultiTree(TreeSeqType2)
+    oroot1 = MultiTree(TreeSeqOri)
+    oroot2 = MultiTree(TreeSeqOri2)
+
     root1.CreatTree()
     root1.Postorder_Level()
     lll = root1.nodes({}) #二维表示
     lllnode = [j for i in lll for j in i]
+
+    oroot1.CreatTree()
+    oroot1.Postorder_Level()
+    olll = oroot1.nodes({}) #二维表示
+    olllnode = [j for i in olll for j in i]
+
     lllloop = []
     for i in lll:
         lllloop.append(len(i))
@@ -280,6 +300,12 @@ def scoremat(TreeSeqFile:str,
     root2.Postorder_Level()
     llll = root2.nodes({}) #二维表示
     llllnode = [j for i in llll for j in i]
+
+    oroot2.CreatTree()
+    oroot2.Postorder_Level()
+    ollll = oroot2.nodes({}) #二维表示
+    ollllnode = [j for i in ollll for j in i]
+
     llllloop = []
     for i in llll:
         llllloop.append(len(i))
@@ -374,8 +400,10 @@ def scoremat(TreeSeqFile:str,
         T1root_T2root.append({'Score':matrix_values[-1][-1],
                             'Root1_label':root1.label, 
                             'Root1_node':root1.nodeobj,
+                            'Root1_seq':oroot1.nodeobj,
                             'Root2_label':root2.label, 
                             'Root2_node':root2.nodeobj, 
+                            'Root2_seq':oroot2.nodeobj, 
                             'row':root1.node_count()-1, 
                             'col':root2.node_count()-1})
 
@@ -405,8 +433,10 @@ def scoremat(TreeSeqFile:str,
             scorelist.append({'Score':maxscore[0], 
                             'Root1_label':lllnode[del_i_index].label, 
                             'Root1_node':lllnode[del_i_index].nodeobj,
+                            'Root1_seq':oroot1[del_i_index].nodeobj,
                             'Root2_label':llllnode[del_j_index].label, 
                             'Root2_node':llllnode[del_j_index].nodeobj, 
+                            'Root2_seq':oroot1[del_j_index].nodeobj,
                             'row':del_i_index, 
                             'col':del_j_index})
 
