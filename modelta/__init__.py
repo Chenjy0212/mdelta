@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*- 
 
-from tkinter.tix import Tree
-from numpy import NaN
 from .ReadFile import *
 from .mytest import *
 from .mymath import *

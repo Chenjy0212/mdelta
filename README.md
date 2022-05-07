@@ -9,7 +9,7 @@
 
 # MODELTA
 
-- Chen and Yang Lab Multi fork Development cell lineage tree alignment algorithm package and executable program.
+- Yang Lab Multi fork Development cell lineage tree alignment algorithm package and executable program.
 
 - You can get the score matrix through them to analyze the node relationship of the pedigree tree, or you can test the correlation.
 
