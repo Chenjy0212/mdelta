@@ -1,13 +1,47 @@
 # -*- coding: utf-8 -*- 
 
-from .ReadFile import *
-from .mytest import *
-from .mymath import *
-from .auxi import *
-from .Pvalue import *
+from ReadFile import *
+from mytest import *
+from mymath import *
+from auxi import *
 import pandas as pd
+import argparse
 from copy import *
+import random
+from multiprocessing import *
+import multiprocessing as mp
+import psutil
 
+parser = argparse.ArgumentParser(prog='MODELTA', description = ' Multi fork Development cell lineage tree alignment',epilog = 'Developer: Yang Lab(https://www.labxing.com/profile/10413), Details: https://github.com/Chenjy0212/modelta')
+parser.add_argument('TreeSeqFile',type=str, help='[path/filename] Cell lineage tree file with branch length information removed.')
+parser.add_argument('TreeSeqFile2',type=str, help='[path/filename] Cell lineage tree file with branch length information removed.')
+parser.add_argument('-nt','--Name2TypeFile',type=str, default='', help='[path/filename] Convert tree node name to type.')
+parser.add_argument('-nt2','--Name2TypeFile2',type=str, default='', help='[path/filename] Convert tree node name to type.')
+parser.add_argument('-sd','--ScoreDictFile',type=str, default='', help='[path/filename] Defines the score of matches between nodes.')
+parser.add_argument('-t','--top',type=int, default=0, help='[int > 0] Select the top few meaningful scores in the score matrix.')
+parser.add_argument('-m','--mv',type=float, default=2., help=' [float] The matching score between the same nodes.')
+parser.add_argument('-p','--pv',type=float, default=-1., help=' [float] The prune score between the different nodes.')
+parser.add_argument('-T','--Tqdm',type=int, default=1, help=' [0(off) or 1(on)] Whether to display the operation progress bar.')
+parser.add_argument('-n','--notebook',type=int, default=0, help='[0(off) or 1(on)] Is it written and run in the jupyter notebook environment.')
+parser.add_argument('-P','--Pvalue',type=int, default=0, help='[int > 0] The number of times the original sequence needs to be disrupted.')
+parser.add_argument('-a','--Alg',type=str, default='KM', help='[KM / GA] Represent KM algorithm and GA algorithm respectively to find the maximum value of each node of the score matrix')
+parser.add_argument('-c','--CPUs',type=int, default=50, help='[int > 0] Multi process computing can greatly reduce the waiting time. The default process pool is 50, but limited by local computer resources, it can reach the maximum number of local CPU cores - 1.')
+
+args = parser.parse_args() #开始解析参数 --对于可选参数来说
+
+TreeSeqFile = args.TreeSeqFile
+TreeSeqFile2 = args.TreeSeqFile2
+Name2TypeFile = args.Name2TypeFile
+Name2TypeFile2 = args.Name2TypeFile2
+ScoreDictFile = args.ScoreDictFile
+top = args.top
+pv = args.pv
+mv = args.mv
+Tqdm = args.Tqdm
+notebook = args.notebook
+Alg = args.Alg
+times = args.Pvalue
+CPUs = args.CPUs
 
 class MultiTree:
     def __init__(self, nodeobj:str, level:'int'=0, label:str="root"):
@@ -255,8 +289,8 @@ def scoremat(TreeSeqFile:str,
             pv:float = -1.,
             mv:float = 2.,
             Alg:str = 'KM',
-            Tqdm:bool = True,
-            notebook:bool = False):
+            Tqdm:int = 1,
+            notebook:int = 0):
     if Name2TypeFile != '':
         TreeSeqType = ReadTreeSeq_Name2Type(TreeSeqFile,Name2TypeFile)
         TreeSeqOri = ReadTreeSeq(TreeSeqFile)
@@ -328,8 +362,8 @@ def scoremat(TreeSeqFile:str,
     ttrace.index.name = 'Root1' 
     ttrace.columns.name = 'Root2'
     trace_value = ttrace.values
-    if Tqdm == True:
-        if notebook == True:
+    if Tqdm == 1:
+        if notebook == 1:
             from tqdm.notebook import tqdm
         else:
             from tqdm import tqdm
@@ -446,10 +480,244 @@ def scoremat(TreeSeqFile:str,
 
     else:
         print("Parameter top cannot be negative, or it might be out of range.")
-    #return({'matrix':mmatrix, 'mrow_addr':lllnode,'mcol_addr':llllnode})
-    #return({'matrix':mmatrix, 'mrow_addr':lllnode,'mcol_addr':llllnode})
-    #print(ttrace)
-    #print(matrix_values[len(lllnode)-1][len(llllnode)-1])
+      
 
-#print(scoremat('modelta/ExampleFile/tree.nwk','modelta/ExampleFile/Name2Type.csv','modelta/ExampleFile/tree.nwk','modelta/ExampleFile/Name2Type.csv','modelta/ExampleFile/Qscorefile.csv'))
-#print(scoremat('modelta/ExampleFile/tree.nwk','modelta/ExampleFile/Name2Type.csv','modelta/ExampleFile/tree.nwk','modelta/ExampleFile/Name2Type.csv'))
+            
+def FindNode(Seq: str, times: int) -> list:
+    result = []
+    if Seq.find('(') == -1:
+        for i in range(times):
+            result.append(Seq)
+        return result
+    Seq_list = []
+    index_list = []
+    index_dict = {}
+    brackets_num = 0  # 括号个数
+    node_num = -1  # 节点序号
+    node_tmp = ''
+    
+    for i in list(Seq):
+        if i == '(':
+            brackets_num += 1
+            Seq_list.append(i)
+            node_num += 1
+        elif i == ',':
+            if brackets_num != 0 and node_tmp:
+                Seq_list.append(node_tmp)
+                node_num += 1
+                index_list.append(node_num)
+                index_dict[node_num] = node_tmp
+                node_tmp = ''
+            Seq_list.append(i)
+            node_num += 1
+        elif i == ')':
+            if node_tmp:
+                Seq_list.append(node_tmp)
+                node_num += 1
+                index_list.append(node_num)
+                index_dict[node_num] = node_tmp
+                node_tmp = ''
+            brackets_num -= 1
+            Seq_list.append(i)
+            node_num += 1
+        else:
+            node_tmp += i
+            if i == ';':
+                Seq_list.append(i)
+                node_num += 1
+    # print(Seq_list)
+    # print(index_dict)
+    # print(index_list)
+    Seq_list_tmp = deepcopy(Seq_list)
+    index_list_tmp = deepcopy(index_list)
+    #print('原来的序列: \n',"".join(Seq_list))
+    #print('改变的序列: \n')
+    for i in range(times):
+        random.shuffle(index_list_tmp)
+        # print(index_list_tmp)
+        for i, j in zip(index_list_tmp, index_list):
+            Seq_list_tmp[j] = index_dict[i]
+        result.append("".join(Seq_list_tmp))
+    return(result)
+
+
+class OP:
+    def __init__(self, seq1_list_result, seq2_list_result, ScoreDictFile, poolnum=1, mv: float = 2., pv: float = -1., notebook:int = 0, Tqdm:int = 1):
+        # 直接调用 Manager 提供的 list() 和 dict()
+        self.manager = mp.Manager
+        self.mp_lst = self.manager().list()
+        self.Seq1_list = seq1_list_result
+        self.Seq2_list = seq2_list_result
+        self.scoredictfile = ScoreDictFile
+        self.mv = mv
+        self.pv = pv
+        self.notebook = notebook
+        self.Tqdm = notebook
+        self.poolnum = min(poolnum, max(psutil.cpu_count(False), 1))
+        self.length = len(seq1_list_result)
+
+    def Foo(self, i, j, scoredictfile):
+        root1_tmp = MultiTree(i)
+        root1_tmp.CreatTree()
+        root1_tmp.Postorder_Level()
+        lll_tmp = root1_tmp.nodes({})  # 二维表示
+        lllnode_tmp = [j for i in lll_tmp for j in i]
+        lllloop_tmp = []
+        for i in lll_tmp:
+            lllloop_tmp.append(len(i))
+        llldict_tmp = {}
+        for index, iter in enumerate(lllnode_tmp):
+            llldict_tmp[index] = [lllnode_tmp.index(i) for i in iter.son()]
+
+        root2_tmp = MultiTree(j)
+        root2_tmp.CreatTree()
+        root2_tmp.Postorder_Level()
+        llll_tmp = root2_tmp.nodes({})  # 二维表示
+        llllnode_tmp = [j for i in llll_tmp for j in i]
+        llllloop_tmp = []
+        for i in llll_tmp:
+            llllloop_tmp.append(len(i))
+        lllldict_tmp = {}
+        for index, iter in enumerate(llllnode_tmp):
+            lllldict_tmp[index] = [llllnode_tmp.index(i) for i in iter.son()]
+
+        score_dict = {}
+        if scoredictfile == '':
+            score_dict = Scoredict(root1_tmp.leaves(
+                []), root2_tmp.leaves([]), self.mv)
+        else:
+            score_dict = QuantitativeScoreFile(scoredictfile)
+
+        mmatrix = pd.DataFrame([[0.0 for i in range(len(llllnode_tmp))] for j in range(len(lllnode_tmp))],
+                               index=[i.nodeobj for i in lllnode_tmp],
+                               columns=[j.nodeobj for j in llllnode_tmp])
+        mmatrix.index.name = 'Root1'
+        mmatrix.columns.name = 'Root2'
+        matrix_values = mmatrix.values
+
+        ttrace = pd.DataFrame([[[] for i in range(len(llllnode_tmp))] for j in range(len(lllnode_tmp))],
+                              index=[i.label for i in lllnode_tmp],
+                              columns=[j.label for j in llllnode_tmp])
+        ttrace.index.name = 'Root1'
+        ttrace.columns.name = 'Root2'
+        trace_value = ttrace.values
+        # 执行循有规律就是(0,0)(0,1)(1,0)(1,1)(0,2)(2,0)(1,2)(2,1)(2,2)(0,3)(3,0)...(n,m)
+        for loop_index in loopindex(root1_tmp.level+1, root2_tmp.level+1):
+            # print(loop_index)
+            for i in range(lllloop_tmp[loop_index[0]]):
+                for j in range(llllloop_tmp[loop_index[1]]):
+                    i_index = 0
+                    j_index = 0
+                    for i_tmp in range(loop_index[0]):
+                        i_index += lllloop_tmp[i_tmp]
+                    i_index += i
+                    for j_tmp in range(loop_index[1]):
+                        j_index += llllloop_tmp[j_tmp]
+                    j_index += j
+                    matrix_tmp = matrix_values[llldict_tmp[i_index], :]
+                    matrix_tmp = matrix_tmp[:, lllldict_tmp[j_index]]
+
+                    matrix_values[i_index][j_index] = GetMaxScore(trace=trace_value,
+                                                                  root1=lll_tmp[loop_index[0]][i],
+                                                                  root2=llll_tmp[loop_index[1]][j],
+                                                                  allmatrix=matrix_values,
+                                                                  root1_index=i_index,
+                                                                  root2_index=j_index,
+                                                                  local_matrix=matrix_tmp,
+                                                                  local_matrix_root1_index=llldict_tmp[i_index],
+                                                                  local_matrix_root2_index=lllldict_tmp[j_index],
+                                                                  dict_score=score_dict,
+                                                                  prune=self.pv,
+                                                                  Algorithm='')
+        # print(mmatrix)
+        # print(ttrace)
+        # print(matrix_values[len(lllnode)-1][len(llllnode)-1])
+        self.mp_lst.append(matrix_values[-1][-1])
+
+    def flow(self):
+        pool = mp.Pool(self.poolnum)
+        if self.Tqdm == 1:
+            if self.notebook == 1:
+                from tqdm.notebook import tqdm
+            else:
+                from tqdm import tqdm
+            pbar = tqdm(total=self.length)
+            pbar.set_description(' Pvalue ')
+            update = lambda *args: pbar.update()
+        else:
+            update = None
+            
+        for i, j in zip(self.Seq1_list, self.Seq2_list):
+            pool.apply_async(func=self.Foo, args=(
+                i, j, self.scoredictfile), callback=update)
+
+        pool.close()
+        pool.join()
+
+
+def pvalue(times: int, 
+           topscorelist, 
+           ScoreDictFile: str = '', 
+           CPUs: int = 50, 
+           mv: float = 2., 
+           pv: float = -1.,
+           notebook: int = 0,
+           Tqdm: int = 1,
+           ):
+    Seq1_list_result_max = []
+    Seq2_list_result_max = []
+    for i in topscorelist:
+        Seq1_list_result_max.append(FindNode(i['Root1_node'], times))
+        Seq2_list_result_max.append(FindNode(i['Root2_node'], times))
+
+    score_list_max = []
+    #print(len(topscorelist))
+    for i in range(len(topscorelist)):
+        op_max = OP(
+            Seq1_list_result_max[i], Seq2_list_result_max[i], ScoreDictFile, CPUs, mv, pv, notebook, Tqdm)
+        op_max.flow()
+        score_list_max.append(op_max.mp_lst + [topscorelist[i]['Score']])
+
+    # score_list_max.append(float(MaxScore))
+    return(score_list_max)
+
+
+if __name__ == '__main__':
+    example = scoremat(TreeSeqFile = TreeSeqFile,
+                         TreeSeqFile2 = TreeSeqFile2,
+                         Name2TypeFile = Name2TypeFile,
+                         Name2TypeFile2 = Name2TypeFile2,
+                         ScoreDictFile = ScoreDictFile,
+                         mv = mv,
+                         top = top,
+                         notebook = notebook,
+                         pv = pv,
+                         Tqdm = Tqdm) 
+    print("\n********** Score Matrix **********\n", example['matrix'])
+             
+    if top == 0:
+        print("\n********** T1root_T2root **********")
+        for key,value in example['T1root_T2root'][0].items():
+            print('{key}:{value}'.format(key = key, value = value))
+
+    elif top > 0:
+        for index,keyss in enumerate(example['TopScoreList']):
+            print('\n********** Top ', index+1, '**********')
+            for key,value in keyss.items():
+                print('{key}:{value}'.format(key = key, value = value))
+                
+
+    if times > 0:
+        ppp = pvalue(times = times, 
+               topscorelist = example['T1root_T2root'] if top == 0 else example['TopScoreList'], 
+               ScoreDictFile = ScoreDictFile,
+               CPUs = CPUs, 
+               mv = mv, 
+               pv = pv,
+               notebook = notebook,
+               Tqdm = Tqdm)
+        print("\n********** P Value **********")
+        print(ppp)
+        #print(psutil.cpu_count(False))
+     
+        

@@ -323,7 +323,7 @@ def FindNode(Seq: str, times: int) -> list:
 
 
 class OP:
-    def __init__(self, seq1_list_result, seq2_list_result, ScoreDictFile, poolnum=1, mv: float = 2., pv: float = -1., notebook:bool = False):
+    def __init__(self, seq1_list_result, seq2_list_result, ScoreDictFile, poolnum=1, mv: float = 2., pv: float = -1., notebook:bool = False, Tqdm:bool = True):
         # 直接调用 Manager 提供的 list() 和 dict()
         self.manager = mp.Manager
         self.mp_lst = self.manager().list()
@@ -332,6 +332,7 @@ class OP:
         self.scoredictfile = ScoreDictFile
         self.mv = mv
         self.pv = pv
+        self.Tqdm = Tqdm
         self.notebook = notebook
         self.poolnum = min(poolnum, max(psutil.cpu_count(False), 1))
         self.length = len(seq1_list_result)
@@ -415,14 +416,18 @@ class OP:
         self.mp_lst.append(matrix_values[-1][-1])
 
     def flow(self):
-        if self.notebook == True:
-            from tqdm.notebook import tqdm
-        else:
-            from tqdm import tqdm
-        pbar = tqdm(total=self.length)
-        pbar.set_description(' Pvalue ')
-        update = lambda *args: pbar.update()
         pool = mp.Pool(self.poolnum)
+        if self.Tqdm == 1:
+            if self.notebook == 1:
+                from tqdm.notebook import tqdm
+            else:
+                from tqdm import tqdm
+            pbar = tqdm(total=self.length)
+            pbar.set_description(' Pvalue ')
+            update = lambda *args: pbar.update()
+        else:
+            update = None
+            
         for i, j in zip(self.Seq1_list, self.Seq2_list):
             pool.apply_async(func=self.Foo, args=(
                 i, j, self.scoredictfile), callback=update)
@@ -438,6 +443,7 @@ def pvalue(times: int,
            mv: float = 2., 
            pv: float = -1.,
            notebook: bool = False,
+           Tqdm: bool = True,
            ):
     Seq1_list_result_max = []
     Seq2_list_result_max = []
@@ -449,7 +455,7 @@ def pvalue(times: int,
     #print(len(topscorelist))
     for i in range(len(topscorelist)):
         op_max = OP(
-            Seq1_list_result_max[i], Seq2_list_result_max[i], ScoreDictFile, CPUs, mv, pv, notebook)
+            Seq1_list_result_max[i], Seq2_list_result_max[i], ScoreDictFile, CPUs, mv, pv, notebook, Tqdm)
         op_max.flow()
         score_list_max.append(op_max.mp_lst + [topscorelist[i]['Score']])
 
