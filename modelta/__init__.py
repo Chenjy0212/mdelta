@@ -5,9 +5,8 @@ from .mytest import *
 from .mymath import *
 from .auxi import *
 from .Pvalue import *
-#import itertools
-#import random
 import pandas as pd
+from copy import *
 
 
 class MultiTree:
@@ -419,7 +418,7 @@ def scoremat(TreeSeqFile:str,
                     changemat(i,tracemat,mat)
             return mat
 
-        mat_tmp = copy.deepcopy(matrix_values)
+        mat_tmp = deepcopy(matrix_values)
         scorelist=[]
         for _ in range(top):
             #print(mat_tmp)
@@ -431,10 +430,10 @@ def scoremat(TreeSeqFile:str,
             scorelist.append({'Score':maxscore[0], 
                             'Root1_label':lllnode[del_i_index].label, 
                             'Root1_node':lllnode[del_i_index].nodeobj,
-                            'Root1_seq':oroot1[del_i_index].nodeobj,
+                            'Root1_seq':olllnode[del_i_index].nodeobj,
                             'Root2_label':llllnode[del_j_index].label, 
                             'Root2_node':llllnode[del_j_index].nodeobj, 
-                            'Root2_seq':oroot1[del_j_index].nodeobj,
+                            'Root2_seq':ollllnode[del_j_index].nodeobj,
                             'row':del_i_index, 
                             'col':del_j_index})
 
@@ -446,7 +445,7 @@ def scoremat(TreeSeqFile:str,
         return({'matrix':mmatrix, 'TopScoreList':scorelist})
 
     else:
-        print("Parameter top cannot be negative and zero, or it might be out of range.")
+        print("Parameter top cannot be negative, or it might be out of range.")
     #return({'matrix':mmatrix, 'mrow_addr':lllnode,'mcol_addr':llllnode})
     #return({'matrix':mmatrix, 'mrow_addr':lllnode,'mcol_addr':llllnode})
     #print(ttrace)
