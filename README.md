@@ -31,17 +31,17 @@
 #### Pip install
 
 ```sh
-run "pip install modelta"
+$"pip install modelta"
 ```
 
 #### Source code install
 
 ```sh
 (1) Offline
-Step1: git clone https://github.com/Chenjy0212/modelta.git
-Step2: cd modelta -> run "python setup.py install"
+Step1: $git clone https://github.com/Chenjy0212/modelta.git
+Step2: $cd modelta -> run "python setup.py install"
 (2) Online
-run "pip install git+https://github.com/Chenjy0212/modelta.git@main"
+$pip install git+https://github.com/Chenjy0212/modelta.git@main
 ```
 
 # For python coder user ↓
@@ -205,9 +205,60 @@ times = 3 #Randomly disrupt the nodes, but the structure remains unchanged
 
 ## Quick Start
 
-We provide executable files, which can be obtained by inputting corresponding parameters at the terminal. Download executable files in different operating environments [[Windows]()] / [[Linux]()]
+We provide executable files, which can be obtained by inputting corresponding parameters at the terminal. Download executable files in different operating environments [[Windows](http://47.106.71.70/EXfile/windows/)] / [[Linux](http://47.106.71.70/EXfile/linux/)]
+
+#### Windows
+
+```sh
+mDELTA.exe ./ExampleFile/tree.nwk ./ExampleFile/tree.nwk -t 3
 ```
 
+#### Linux
+
+```sh
+./mDELTA ../ExampleFile/tree.nwk ../ExampleFile/tree.nwk -t 3
+```
+
+#### Help
+
+```sh
+Windows: $mDELTA.exe -h
+ Linux:  $./mDELTA -h
+```
+
+```
+usage: MODELTA [-h] [-nt NAME2TYPEFILE] [-nt2 NAME2TYPEFILE2] [-sd SCOREDICTFILE] [-t TOP] [-m MV] [-p PV] [-T TQDM] [-n NOTEBOOK]
+               [-P PVALUE] [-a ALG] [-c CPUS]
+               TreeSeqFile TreeSeqFile2
+
+Multi fork Development cell lineage tree alignment
+
+positional arguments:
+  TreeSeqFile           [path/filename] Cell lineage tree file with branch length information removed.
+  TreeSeqFile2          [path/filename] Cell lineage tree file with branch length information removed.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -nt NAME2TYPEFILE, --Name2TypeFile NAME2TYPEFILE
+                        [path/filename] Convert tree node name to type.
+  -nt2 NAME2TYPEFILE2, --Name2TypeFile2 NAME2TYPEFILE2
+                        [path/filename] Convert tree node name to type.
+  -sd SCOREDICTFILE, --ScoreDictFile SCOREDICTFILE
+                        [path/filename] Defines the score of matches between nodes.
+  -t TOP, --top TOP     [int > 0] Select the top few meaningful scores in the score matrix.
+  -m MV, --mv MV        [float] The matching score between the same nodes.
+  -p PV, --pv PV        [float] The prune score between the different nodes.
+  -T TQDM, --Tqdm TQDM  [0(off) or 1(on)] Whether to display the operation progress bar.
+  -n NOTEBOOK, --notebook NOTEBOOK
+                        [0(off) or 1(on)] Is it written and run in the jupyter notebook environment.
+  -P PVALUE, --Pvalue PVALUE
+                        [int > 0] The number of times the original sequence needs to be disrupted.
+  -a ALG, --Alg ALG     [KM / GA] Represent KM algorithm and GA algorithm respectively to find the maximum value of each node of
+                        the score matrix
+  -c CPUS, --CPUs CPUS  [int > 0] Multi process computing can greatly reduce the waiting time. The default process pool is 50, but
+                        limited by local computer resources, it can reach the maximum number of local CPU cores - 1.
+
+Developer: Yang Lab(https://www.labxing.com/profile/10413), Details: https://github.com/Chenjy0212/modelta
 ```
 
 # Citation
