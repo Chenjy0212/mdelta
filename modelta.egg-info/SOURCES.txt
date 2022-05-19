@@ -7,6 +7,7 @@ modelta/ReadFile.py
 modelta/__init__.py
 modelta/__version__.py
 modelta/auxi.py
+modelta/mDELTA.py
 modelta/mymath.py
 modelta/mytest.py
 modelta.egg-info/PKG-INFO

@@ -244,7 +244,7 @@ optional arguments:
   -nt2 NAME2TYPEFILE2, --Name2TypeFile2 NAME2TYPEFILE2
                         [path/filename] Convert tree node name to type.
   -sd SCOREDICTFILE, --ScoreDictFile SCOREDICTFILE
-                        [path/filename] Defines the score of matches between nodes.
+                        [path/filename] Defines the score of matches between types.
   -t TOP, --top TOP     [int > 0] Select the top few meaningful scores in the score matrix.
   -m MV, --mv MV        [float] The matching score between the same nodes.
   -p PV, --pv PV        [float] The prune score between the different nodes.
