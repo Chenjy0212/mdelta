@@ -335,6 +335,9 @@ optional arguments:
                         the score matrix
   -c CPUS, --CPUs CPUS  [int > 0] Multi process computing can greatly reduce the waiting time. The default process pool is 50, but
                         limited by local computer resources, it can reach the maximum number of local CPU cores - 1.
+  -x overlap, --overlap overlap
+                        [int > 0] In the local results, the later comparison results cannot have X% or more node pairs that duplicate the previous results.
+
 
 Developer: Yang Lab(https://www.labxing.com/profile/10413), Details: https://github.com/Chenjy0212/modelta
 ```
