@@ -58,12 +58,9 @@ example = modelta.scoremat(TreeSeqFile = 'ExampleFile/tree.nwk',
                        TreeSeqFile2 = 'ExampleFile/tree.nwk',
                        Name2TypeFile = 'ExampleFile/Name2Type.csv',
                        Name2TypeFile2 ='ExampleFile/Name2Type.csv',
-                       ScoreDictFile = 'ExampleFile/scorefile.csv',
-                       mv = 2,
-                       top = 0,
-                       notebook = True,
-                       pv = -1,
-                       Tqdm = True,)
+                       top = 3,
+                       notebook = 1,
+                       overlap = 5,)
 pprint(example)
 ```
 
@@ -72,28 +69,79 @@ pprint(example)
 ```
 Matrix Node: |██████████| 121/121 100%
 121/121 [00:00<00:00, 2573.11it/s]
-
 {'TopScoreList': [{'Root1_label': 'root',
+                   'Root1_match': ['0',
+                                   '1',
+                                   '0,0',
+                                   '0,1',
+                                   '0,2',
+                                   '0,0,0',
+                                   '0,0,1',
+                                   '0,0,2',
+                                   '0,2,0',
+                                   '0,2,1'],
                    'Root1_node': '(((a,b,c),d,(e,f)),a)',
+                   'Root1_prune': [],
+                   'Root1_seq': '(((a1,a2,a3),a4,(a5,a6)),a1)',
                    'Root2_label': 'root',
+                   'Root2_match': ['0',
+                                   '1',
+                                   '0,0',
+                                   '0,1',
+                                   '0,2',
+                                   '0,0,0',
+                                   '0,0,1',
+                                   '0,0,2',
+                                   '0,2,0',
+                                   '0,2,1'],
                    'Root2_node': '(((a,b,c),d,(e,f)),a)',
+                   'Root2_prune': [],
+                   'Root2_seq': '(((a1,a2,a3),a4,(a5,a6)),a1)',
                    'Score': 14.0,
                    'col': 10,
                    'row': 10},
                   {'Root1_label': '0',
+                   'Root1_match': ['0',
+                                   '0,0',
+                                   '0,1',
+                                   '0,2',
+                                   '0,0,0',
+                                   '0,0,1',
+                                   '0,0,2',
+                                   '0,2,0',
+                                   '0,2,1'],
                    'Root1_node': '((a,b,c),d,(e,f))',
+                   'Root1_prune': ['1'],
+                   'Root1_seq': '((a1,a2,a3),a4,(a5,a6))',
                    'Root2_label': 'root',
+                   'Root2_match': ['0',
+                                   '0,0',
+                                   '0,1',
+                                   '0,2',
+                                   '0,0,0',
+                                   '0,0,1',
+                                   '0,0,2',
+                                   '0,2,0',
+                                   '0,2,1'],
                    'Root2_node': '(((a,b,c),d,(e,f)),a)',
+                   'Root2_prune': ['1'],
+                   'Root2_seq': '(((a1,a2,a3),a4,(a5,a6)),a1)',
                    'Score': 11.0,
                    'col': 10,
                    'row': 9},
-                  {'Root1_label': 'root',
-                   'Root1_node': '(((a,b,c),d,(e,f)),a)',
+                  {'Root1_label': '0,0',
+                   'Root1_match': ['0,0', '0,0,0', '0,0,1', '0,0,2'],
+                   'Root1_node': '(a,b,c)',
+                   'Root1_prune': ['0,1', '0,2,0', '0,2,1'],
+                   'Root1_seq': '(a1,a2,a3)',
                    'Root2_label': '0',
+                   'Root2_match': ['0,0', '0,0,0', '0,0,1', '0,0,2'],
                    'Root2_node': '((a,b,c),d,(e,f))',
-                   'Score': 11.0,
+                   'Root2_prune': ['0,1', '0,2,0', '0,2,1', '1'],
+                   'Root2_seq': '((a1,a2,a3),a4,(a5,a6))',
+                   'Score': 3.0,
                    'col': 9,
-                   'row': 10}],
+                   'row': 7}],
  'matrix': Root2  0,0,0  0,0,1  0,0,2  0,1  0,2,0  0,2,1    1  0,0  0,2     0  root
 Root1                                                                   
 0,0,0    2.0   -1.0   -1.0 -1.0   -1.0   -1.0  2.0  0.0 -1.0  -1.0  -1.0
@@ -120,16 +168,45 @@ root    -1.0   -1.0   -1.0 -1.0   -1.0   -1.0 -1.0  2.0 -1.0  11.0  14.0}
 
 ```
 {'T1root_T2root': [{'Root1_label': 'root',
+                    'Root1_match': ['0',
+                                    '1',
+                                    '0,0',
+                                    '0,1',
+                                    '0,2',
+                                    '0,0,0',
+                                    '0,0,1',
+                                    '0,0,2',
+                                    '0,2,0',
+                                    '0,2,1'],
                     'Root1_node': '(((a,b,c),d,(e,f)),a)',
+                    'Root1_prune': [],
+                    'Root1_seq': '(((a1,a2,a3),a4,(a5,a6)),a1)',
                     'Root2_label': 'root',
+                    'Root2_match': ['0',
+                                    '1',
+                                    '0,0',
+                                    '0,1',
+                                    '0,2',
+                                    '0,0,0',
+                                    '0,0,1',
+                                    '0,0,2',
+                                    '0,2,0',
+                                    '0,2,1'],
                     'Root2_node': '(((a,b,c),d,(e,f)),a)',
+                    'Root2_prune': [],
+                    'Root2_seq': '(((a1,a2,a3),a4,(a5,a6)),a1)',
                     'Score': 14.0,
                     'col': 10,
-                    'row': 10}],                                                    
+                    'row': 10}],
+                    
+                    ......
+
+}                   
 ```
 
 - `notebook`: [*bool* and `default`=*False*] Is it written and run in the jupyter notebook environment.
 - `Tqdm`: [*bool* and `default`=*True*] Whether to display the operation progress bar.
+- `overlap`: [*int > 0* and `default` = *0*] In the local results, the later comparison results cannot have X% or more node pairs that duplicate the previous results.
 
 **if Qualitative calculation:**
 
@@ -182,6 +259,7 @@ modelta.pvalue(times = 3,
  Pvalue : 100%|██████████| 3/3 [00:00<00:00,  4.45it/s]
 [[3.0, 4.0, 0.0, 14.0], [4.0, 5.0, 3.0, 11.0], [5.0, 0.0, 1.0, 11.0]]
 ```
+
 The returned results represent `times` matching scores corresponding to the `top` maximum values
 
 #### Parameter analysis
@@ -199,7 +277,7 @@ times = 3 #Randomly disrupt the nodes, but the structure remains unchanged
 
 - `topscorelist`: [*example['TopScoreList']* `*`] The input parameter is the maximum value sequence obtained earlier.
 - `CPUs`: [*int > 0* and `default` = *50*] Multi process computing can greatly reduce the waiting time. The default process pool is 50, but limited by local computer resources, it can reach the maximum number of local CPU cores - 1.
-- `mv` & `pv` & `notebook` & `Tqdm` parameters have been described in detail before
+- `mv` & `pv` & `notebook` & `Tqdm` & `overlap` parameters have been described in detail before
 
 # For Ordinary user ↓
 
@@ -277,6 +355,7 @@ If you use this project in your research, please cite this project.
 ```
 
 # Introduction
+
 <div align=center>
 
 Student of [@SYSU](https://github.com/sysu). :school:
@@ -290,3 +369,11 @@ How to contact the author has been written at the top. :eyes:
 
 <img alt="sysulogo" src="./image/sysulogo.png" width=200 />
 </div>
+
+# Update
+
+**2022-05-25**
+
+Add internal node correspondence, output results: `Root_ match` and `Root_ prune` 
+
+Add a new parameter `-x` & `--overlap`. For example, if the value is x%, in the local result, the later comparison result cannot have x% or more node pairs that duplicate the previous result.

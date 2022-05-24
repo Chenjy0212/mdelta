@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: modelta
-Version: 1.0.1
+Version: 1.0.2
 Summary: Chen and Yang Lab Multi fork Development cell lineage tree alignment 
 Home-page: https://github.com/Chenjy0212/modelta
 Author: EeWhile(Jingyu Chen)
@@ -263,7 +263,7 @@ optional arguments:
   -nt2 NAME2TYPEFILE2, --Name2TypeFile2 NAME2TYPEFILE2
                         [path/filename] Convert tree node name to type.
   -sd SCOREDICTFILE, --ScoreDictFile SCOREDICTFILE
-                        [path/filename] Defines the score of matches between nodes.
+                        [path/filename] Defines the score of matches between types.
   -t TOP, --top TOP     [int > 0] Select the top few meaningful scores in the score matrix.
   -m MV, --mv MV        [float] The matching score between the same nodes.
   -p PV, --pv PV        [float] The prune score between the different nodes.
@@ -296,6 +296,7 @@ If you use this project in your research, please cite this project.
 ```
 
 # Introduction
+
 <div align=center>
 
 Student of [@SYSU](https://github.com/sysu). :school:
@@ -309,3 +310,11 @@ How to contact the author has been written at the top. :eyes:
 
 <img alt="sysulogo" src="./image/sysulogo.png" width=200 />
 </div>
+
+# Update
+
+**2022-05-25**
+
+Add internal node correspondence, output results: `Root_ match` and `Root_ prune` 
+
+Add a new parameter `-x` & `--overlap`. For example, if the value is x%, in the local result, the later comparison result cannot have x% or more node pairs that duplicate the previous result.

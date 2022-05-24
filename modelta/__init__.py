@@ -255,8 +255,9 @@ def scoremat(TreeSeqFile:str,
             pv:float = -1.,
             mv:float = 2.,
             Alg:str = 'KM',
-            Tqdm:bool = True,
-            notebook:bool = False):
+            Tqdm:int = 1,
+            notebook:int = 0,
+            overlap:int = 0):
     if Name2TypeFile != '':
         TreeSeqType = ReadTreeSeq_Name2Type(TreeSeqFile,Name2TypeFile)
         TreeSeqOri = ReadTreeSeq(TreeSeqFile)
@@ -328,8 +329,8 @@ def scoremat(TreeSeqFile:str,
     ttrace.index.name = 'Root1' 
     ttrace.columns.name = 'Root2'
     trace_value = ttrace.values
-    if Tqdm == True:
-        if notebook == True:
+    if Tqdm == 1:
+        if notebook == 1:
             from tqdm.notebook import tqdm
         else:
             from tqdm import tqdm
@@ -392,64 +393,102 @@ def scoremat(TreeSeqFile:str,
                                                                         Algorithm=Alg,
                                                                         prune=pv,)
     
-    if top == 0: #默认情况下
-        T1root_T2root = []
-        T1root_T2root.append({'Score':matrix_values[-1][-1],
-                            'Root1_label':root1.label, 
-                            'Root1_node':root1.nodeobj,
-                            'Root1_seq':oroot1.nodeobj,
-                            'Root2_label':root2.label, 
-                            'Root2_node':root2.nodeobj, 
-                            'Root2_seq':oroot2.nodeobj, 
-                            'row':root1.node_count()-1, 
-                            'col':root2.node_count()-1})
-
-        return({'matrix':mmatrix, 'T1root_T2root':T1root_T2root})
-    elif top > 0 and top < min(root1.node_count(), root2.node_count()):
-
-        def changemat(rac, tracemat, mat):
-            for i in tracemat[tuple(rac)]:
+    def changemat(rac, tracemat, tracemat_value, mat, list_tmp1, list_tmp2):
+            for i in tracemat_value[tuple(rac)]:
+                list_tmp1.append(tracemat.index[i[0]])
+                list_tmp2.append(tracemat.columns[i[1]])
+                #print(i[0],i[0])
+            for i in tracemat_value[tuple(rac)]:
                 #print(i[0],root1.leaf_count(), i[1],root2.leaf_count())
                 if i == [] or (i[0]<root1.leaf_count() and i[1] <root2.leaf_count()):
                     mat[tuple(i)] = -99999.
                 else:
                     mat[tuple(i)] = -99999.
                     #print(i)
-                    changemat(i,tracemat,mat)
-            return mat
+                    changemat(i, tracemat,tracemat_value, mat, list_tmp1, list_tmp2)
+            #return mat
+    def where_prune(match_list:list, leaves_list:list):
+        leaves_list_tmp = deepcopy(leaves_list)
+        for i in leaves_list:
+            if i in match_list:
+                leaves_list_tmp.remove(i)
+        return leaves_list_tmp
+    
+    if top == 0: #默认情况下
+        T1root_T2root = []
+        
+        mat_tmp = deepcopy(matrix_values)
+        list_tmp1 = []
+        list_tmp2 = []
+        mat_tmp[-1,-1] = -99999.
+        changemat([-1,-1],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
+        
+        #list_tmp1.insert(0,root1.label)
+        #list_tmp2.insert(0,root2.label)
+        T1root_T2root.append({'Score':matrix_values[-1][-1],
+                            'Root1_label':root1.label, 
+                            'Root1_node':root1.nodeobj,
+                            'Root1_seq':oroot1.nodeobj,
+                            'Root2_label':root2.label, 
+                            'Root2_node':root2.nodeobj, 
+                            'Root2_seq':oroot2.nodeobj,
+                            'Root1_match': list_tmp1,
+                            'Root2_match': list_tmp2,
+                            'Root1_prune':where_prune(list_tmp1, list(map(lambda x:x.label,root1.leaves([])))),
+                            'Root2_prune':where_prune(list_tmp2, list(map(lambda x:x.label,root2.leaves([])))),
+                            'row':root1.node_count()-1, 
+                            'col':root2.node_count()-1})
+
+        return({'matrix':mmatrix, 'T1root_T2root':T1root_T2root})
+        
+    elif top > 0 and top < min(root1.node_count(), root2.node_count()):
 
         mat_tmp = deepcopy(matrix_values)
         scorelist=[]
-        for _ in range(top):
+        for jjj in range(top):
             #print(mat_tmp)
-            maxscore = np.max(mat_tmp),
+            maxscore = np.max(mat_tmp)
             del_i_index = np.where(mat_tmp==np.max(mat_tmp))[0][0]
             del_j_index = np.where(mat_tmp==np.max(mat_tmp))[1][0]
-            #scorelist.append([np.max(mat_tmp),mat.index[del_i_index],mat.columns[del_j_index]])
-            #scorelist.append([np.max(mat_tmp), del_i_index, del_j_index])
-            scorelist.append({'Score':maxscore[0], 
+            
+            list_tmp1 = []
+            list_tmp2 = []
+            mat_tmp[del_i_index,del_j_index] = -99999.
+            changemat([del_i_index,del_j_index],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
+            #if list_tmp1[0] != lllnode[del_i_index].label:
+            #    list_tmp1.insert(0,lllnode[del_i_index].label)
+            #if list_tmp2[0] != llllnode[del_j_index].label:    
+            #    list_tmp2.insert(0,llllnode[del_j_index].label)
+            if jjj > 0:
+                percent = (len(list(set(list_tmp1) - set(scorelist[-1]['Root1_match'])) + list(set(scorelist[-1]['Root1_match']) - set(list_tmp1))) / len(scorelist[-1]['Root1_match']))*100.
+                if round(percent) < overlap:
+                    #print(round(percent))
+                    maxscore = np.max(mat_tmp)
+                    del_i_index = np.where(mat_tmp==np.max(mat_tmp))[0][0]
+                    del_j_index = np.where(mat_tmp==np.max(mat_tmp))[1][0]
+                    
+                    list_tmp1 = []
+                    list_tmp2 = []
+                    mat_tmp[del_i_index,del_j_index] = -99999.
+                    changemat([del_i_index,del_j_index],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
+                    
+                 
+                
+            scorelist.append({'Score':maxscore,
                             'Root1_label':lllnode[del_i_index].label, 
                             'Root1_node':lllnode[del_i_index].nodeobj,
                             'Root1_seq':olllnode[del_i_index].nodeobj,
                             'Root2_label':llllnode[del_j_index].label, 
                             'Root2_node':llllnode[del_j_index].nodeobj, 
                             'Root2_seq':ollllnode[del_j_index].nodeobj,
+                            'Root1_match': list_tmp1,
+                            'Root2_match': list_tmp2,
+                            'Root1_prune':where_prune(list_tmp1, list(map(lambda x:x.label,lllnode[del_i_index].leaves([])))),
+                            'Root2_prune':where_prune(list_tmp2, list(map(lambda x:x.label,llllnode[del_j_index].leaves([])))),
                             'row':del_i_index, 
                             'col':del_j_index})
 
-            #trace_value[del_i_index, del_j_index]
-            mat_tmp[del_i_index,del_j_index] = -99999.
-            mat_tmp = changemat([del_i_index,del_j_index],trace_value,mat_tmp)
-
-
         return({'matrix':mmatrix, 'TopScoreList':scorelist})
-
+        
     else:
         print("Parameter top cannot be negative, or it might be out of range.")
-    #return({'matrix':mmatrix, 'mrow_addr':lllnode,'mcol_addr':llllnode})
-    #return({'matrix':mmatrix, 'mrow_addr':lllnode,'mcol_addr':llllnode})
-    #print(ttrace)
-    #print(matrix_values[len(lllnode)-1][len(llllnode)-1])
-
-#print(scoremat('modelta/ExampleFile/tree.nwk','modelta/ExampleFile/Name2Type.csv','modelta/ExampleFile/tree.nwk','modelta/ExampleFile/Name2Type.csv','modelta/ExampleFile/Qscorefile.csv'))
-#print(scoremat('modelta/ExampleFile/tree.nwk','modelta/ExampleFile/Name2Type.csv','modelta/ExampleFile/tree.nwk','modelta/ExampleFile/Name2Type.csv'))
