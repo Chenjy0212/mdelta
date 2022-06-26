@@ -309,7 +309,7 @@ usage: MODELTA [-h] [-nt NAME2TYPEFILE] [-nt2 NAME2TYPEFILE2] [-sd SCOREDICTFILE
                [-P PVALUE] [-a ALG] [-c CPUS]
                TreeSeqFile TreeSeqFile2
 
-Multi fork Development cell lineage tree alignment
+Yang Lab Multifuricating Developmental cEll Lineage Tree Alignment (mDELTA) algorithm
 
 positional arguments:
   TreeSeqFile           [path/filename] Cell lineage tree file with branch length information removed.

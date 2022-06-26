@@ -395,17 +395,22 @@ def scoremat(TreeSeqFile:str,
     
     def changemat(rac, tracemat, tracemat_value, mat, list_tmp1, list_tmp2):
             for i in tracemat_value[tuple(rac)]:
-                list_tmp1.append(tracemat.index[i[0]])
-                list_tmp2.append(tracemat.columns[i[1]])
+                if isinstance(i[0],int) and isinstance(i[1],int):
+                    list_tmp1.append(tracemat.index[i[0]])
+                    list_tmp2.append(tracemat.columns[i[1]])
+                else:
+                    list_tmp1.append(tracemat.index[rac[0]])
+                    list_tmp2.append(tracemat.columns[rac[1]])
                 #print(i[0],i[0])
             for i in tracemat_value[tuple(rac)]:
-                #print(i[0],root1.leaf_count(), i[1],root2.leaf_count())
-                if i == [] or (i[0]<root1.leaf_count() and i[1] <root2.leaf_count()):
-                    mat[tuple(i)] = -99999.
-                else:
-                    mat[tuple(i)] = -99999.
-                    #print(i)
-                    changemat(i, tracemat,tracemat_value, mat, list_tmp1, list_tmp2)
+                if isinstance(i[0],int) and isinstance(i[1],int):
+                    #print(i[0],root1.leaf_count(), i[1],root2.leaf_count())
+                    if i == [] or (i[0]<root1.leaf_count() and i[1] <root2.leaf_count()):
+                        mat[tuple(i)] = -99999.
+                    else:
+                        mat[tuple(i)] = -99999.
+                        #print(i)
+                        changemat(i, tracemat,tracemat_value, mat, list_tmp1, list_tmp2)
             #return mat
     def where_prune(match_list:list, leaves_list:list):
         leaves_list_tmp = deepcopy(leaves_list)
@@ -460,7 +465,10 @@ def scoremat(TreeSeqFile:str,
             #if list_tmp2[0] != llllnode[del_j_index].label:    
             #    list_tmp2.insert(0,llllnode[del_j_index].label)
             if jjj > 0:
-                percent = (len(list(set(list_tmp1) - set(scorelist[-1]['Root1_match'])) + list(set(scorelist[-1]['Root1_match']) - set(list_tmp1))) / len(scorelist[-1]['Root1_match']))*100.
+                if len(scorelist[-1]['Root1_match']) == 0:
+                    percent = 0
+                else:
+                    percent = (len(list(set(list_tmp1) - set(scorelist[-1]['Root1_match'])) + list(set(scorelist[-1]['Root1_match']) - set(list_tmp1))) / len(scorelist[-1]['Root1_match']))*100.
                 if round(percent) < overlap:
                     #print(round(percent))
                     maxscore = np.max(mat_tmp)
