@@ -70,6 +70,8 @@ def GetMaxScore(trace,
                 local_matrix,
                 local_matrix_root1_index,
                 local_matrix_root2_index,
+                lll_label,
+                llll_label,
                 prune=-1.,
                 dict_score={},
                 Algorithm:str = 'KM'):
@@ -213,5 +215,46 @@ def GetMaxScore(trace,
                     score = score_tmp
                     trace[root1_index][root2_index].clear()
                     trace[root1_index][root2_index].append([root1_index,j[1]])
-                #score = max(allmatrix[root1_index,j[1]] + prune*(r2leaf - j[0].leaf_count()), score)      
+                #score = max(allmatrix[root1_index,j[1]] + prune*(r2leaf - j[0].leaf_count()), score)     
+        #处理多叉极端情况
+        #print(root1.label, root1.node_count(), root2.label, root2.node_count())
+        #print(root1.node_count() - root1.leaf_count() - 1, root2.node_count() - root2.leaf_count() - 1)
+        #print(root1.nodeobj, root2.nodeobj)
+        root1_leaves_nodeobj = []
+        root2_leaves_nodeobj = []
+        root1_leaves_label = []
+        root2_leaves_label = []
+        for i in root1.leaves_label_nodeobj([]):
+            root1_leaves_nodeobj.append(i.nodeobj)
+            root1_leaves_label.append(i.label)
+            #print('Leav：',i.label)
+        for j in root2.leaves_label_nodeobj([]):
+            root2_leaves_nodeobj.append(j.nodeobj)
+            root2_leaves_label.append(j.label)
+            #print('Leav：',j.label)
+        #print(root1_leaves_label_nodeobj)
+        #print(root1_leaves_label)
+        #print(root2_leaves_label_nodeobj)
+            
+        a = [x for x in root1_leaves_nodeobj if x in root2_leaves_nodeobj]
+        b = [root1_leaves_label[x] for x,xi in enumerate(root1_leaves_nodeobj) if xi in a]
+        c = [root2_leaves_label[x] for x,xi in enumerate(root2_leaves_nodeobj) if xi in a]
+        #print(a)
+        #print(b)
+        #print(c)
+        
+    
+
+        score_tmpp = ((root1.node_count() - root1.leaf_count() - 1) + (root2.node_count() - root2.leaf_count() - 1) + abs(root1.leaf_count() - root2.leaf_count())) * prune
+        #print(abs(root1.leaf_count() - root2.leaf_count()))
+        for x in a:
+            score_tmpp += dict_score[x+'_'+x]
+        
+        if score_tmpp > score:
+            score = score_tmpp
+            trace[root1_index][root2_index].clear()
+            for i in zip(b,c):
+                trace[root1_index][root2_index].append([lll_label.index(i[0]), llll_label.index(i[1])])
+                #print(lll_label.index(i[0]), llll_label.index(i[1]))
+        #print(lll_label, llll_label) 
         return score

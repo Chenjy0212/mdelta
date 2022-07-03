@@ -97,22 +97,51 @@ class MultiTree:
         else:
             return 1 + max(self.left.height(), self.right.height())
     # 原来的多叉树的叶子节点
-    def leaves(self,ll=[]):
+    def leaves(self,ll=[], flag = 0):
         lll = ll
         if self.nodeobj is None:
             return None
         elif self.left is None and self.right is None:
             #print(self.nodeobj, end=' ')
             lll.append(self)
+        elif self.right is None and self.left is not None:
+            self.left.leaves(lll,flag = 1)
         elif self.left is None and self.right is not None:
             #print(self.nodeobj, end=' ')
-            lll.append(self)
-            self.right.leaves(lll)
-        elif self.right is None and self.left is not None:
-            self.left.leaves(lll)
+            if flag == 1:
+                lll.append(self)
+                self.right.leaves(lll)
+            else:
+                lll.append(self)
         else:
-            self.left.leaves(lll)
-            self.right.leaves(lll)
+            if flag == 1:
+                self.left.leaves(lll, 1)
+                self.right.leaves(lll)
+            else:
+                self.left.leaves(lll,1)
+        return lll
+    def leaves_label_nodeobj(self,ll=[], flag = 0):
+        lll = ll
+        if self.nodeobj is None:
+            return None
+        elif self.left is None and self.right is None:
+            #print(self.nodeobj, end=' ')
+            lll.append(self)
+        elif self.right is None and self.left is not None:
+            self.left.leaves(lll, 1)
+        elif self.left is None and self.right is not None:
+            #print(self.nodeobj, end=' ')
+            if flag == 1:
+                lll.append(self)
+                self.right.leaves(lll)
+            else:
+                lll.append(self)
+        else:
+            if flag == 1:
+                self.left.leaves(lll, 1)
+                self.right.leaves(lll)
+            else:
+                self.left.leaves(lll,1)
         return lll
     #生成树
     def CreatTree(self):
@@ -192,17 +221,20 @@ class MultiTree:
             return self.left.leaf_count(0) + self.right.leaf_count(0)
         
     #总节点个数
-    def node_count(self):
+    def node_count(self, flag = 0):
         if self is None:
             return 0
         elif self.left is None and self.right is None:
             return 1
         elif self.left is not None and self.right is not None:
-            return 1 + self.left.node_count() + self.right.node_count()
+            if flag == 1:
+                return 1 + self.left.node_count(1) + self.right.node_count()
+            else:
+                return 1 + self.left.node_count()
         elif self.left is None and self.right is not None:
             return 1 + self.right.node_count()
         elif self.right is None and self.left is not None:
-            return 1 + self.left.node_count()
+            return 1 + self.left.node_count(1)
         #else:
             #return self.left.node_count()+ self.right.node_count()
     #获取当前节点一级子节点个数
@@ -362,7 +394,9 @@ def scoremat(TreeSeqFile:str,
                                                                         local_matrix_root2_index = lllldict[j_index], 
                                                                         dict_score=score_dict,
                                                                         Algorithm=Alg,
-                                                                        prune=pv,)
+                                                                        prune=pv,
+                                                                        lll_label = [i.label for i in lll[0]],
+                                                                        llll_label = [i.label for i in llll[0]],)
                         pbar.update(1)
     else:
         for loop_index in loopindex(root1.level+1,root2.level+1):
@@ -391,16 +425,19 @@ def scoremat(TreeSeqFile:str,
                                                                         local_matrix_root2_index = lllldict[j_index], 
                                                                         dict_score=score_dict,
                                                                         Algorithm=Alg,
-                                                                        prune=pv,)
+                                                                        prune=pv,
+                                                                        lll_label = [i.label for i in lll[0]],
+                                                                        llll_label = [i.label for i in llll[0]],)
     
     def changemat(rac, tracemat, tracemat_value, mat, list_tmp1, list_tmp2):
             for i in tracemat_value[tuple(rac)]:
                 if isinstance(i[0],int) and isinstance(i[1],int):
                     list_tmp1.append(tracemat.index[i[0]])
                     list_tmp2.append(tracemat.columns[i[1]])
-                else:
+                elif not isinstance(i[0],int) and not isinstance(i[1],int):    
                     list_tmp1.append(tracemat.index[rac[0]])
                     list_tmp2.append(tracemat.columns[rac[1]])
+                    return
                 #print(i[0],i[0])
             for i in tracemat_value[tuple(rac)]:
                 if isinstance(i[0],int) and isinstance(i[1],int):

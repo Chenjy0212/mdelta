@@ -104,24 +104,52 @@ class MultiTree:
             return 1 + max(self.left.height(), self.right.height())
     # 鍘熸潵鐨勫鍙夋爲鐨勫彾瀛愯妭鐐?
 
-    def leaves(self, ll=[]):
+    def leaves(self,ll=[], flag = 0):
         lll = ll
         if self.nodeobj is None:
             return None
         elif self.left is None and self.right is None:
             #print(self.nodeobj, end=' ')
             lll.append(self)
+        elif self.right is None and self.left is not None:
+            self.left.leaves(lll,flag = 1)
         elif self.left is None and self.right is not None:
             #print(self.nodeobj, end=' ')
-            lll.append(self)
-            self.right.leaves(lll)
-        elif self.right is None and self.left is not None:
-            self.left.leaves(lll)
+            if flag == 1:
+                lll.append(self)
+                self.right.leaves(lll,1)
+            else:
+                lll.append(self)
         else:
-            self.left.leaves(lll)
-            self.right.leaves(lll)
+            if flag == 1:
+                self.left.leaves(lll, 1)
+                self.right.leaves(lll)
+            else:
+                self.left.leaves(lll,1)
         return lll
-    # 鐢熸垚鏍?
+    def leaves_label_nodeobj(self,ll=[], flag = 0):
+        lll = ll
+        if self.nodeobj is None:
+            return None
+        elif self.left is None and self.right is None:
+            #print(self.nodeobj, end=' ')
+            lll.append(self)
+        elif self.right is None and self.left is not None:
+            self.left.leaves(lll, 1)
+        elif self.left is None and self.right is not None:
+            #print(self.nodeobj, end=' ')
+            if flag == 1:
+                lll.append(self)
+                self.right.leaves(lll,1)
+            else:
+                lll.append(self)
+        else:
+            if flag == 1:
+                self.left.leaves(lll, 1)
+                self.right.leaves(lll)
+            else:
+                self.left.leaves(lll,1)
+        return lll
 
     def CreatTree(self):
         if(self.nodeobj[0] == '('):  # 瀛樺湪鎷彿鎰忓懗鐫€杩樻病杈惧埌鍙跺瓙缁撶偣
@@ -205,21 +233,23 @@ class MultiTree:
         else:
             return self.left.leaf_count(0) + self.right.leaf_count(0)
 
-    # 鎬昏妭鐐逛釜鏁?
-    def node_count(self):
+    #总节点个数
+    def node_count(self, flag = 0):
         if self is None:
             return 0
         elif self.left is None and self.right is None:
             return 1
         elif self.left is not None and self.right is not None:
-            return 1 + self.left.node_count() + self.right.node_count()
+            if flag == 1:
+                return 1 + self.left.node_count(1) + self.right.node_count()
+            else:
+                return 1 + self.left.node_count()
         elif self.left is None and self.right is not None:
             return 1 + self.right.node_count()
         elif self.right is None and self.left is not None:
-            return 1 + self.left.node_count()
-        # else:
-            # return self.left.node_count()+ self.right.node_count()
-    # 鑾峰彇褰撳墠鑺傜偣涓€绾у瓙鑺傜偣涓暟
+            return 1 + self.left.node_count(1)
+        #else:
+            #return self.left.node_count()+ self.right.node_count()
 
     def son_count(self):
         self_tmp = self
@@ -409,7 +439,9 @@ class OP:
                                                                   local_matrix_root2_index=lllldict_tmp[j_index],
                                                                   dict_score=score_dict,
                                                                   prune=self.pv,
-                                                                  Algorithm='')
+                                                                  Algorithm='',
+                                                                  lll_label = [i.label for i in lll_tmp[0]],
+                                                                  llll_label = [i.label for i in llll_tmp[0]],)
         # print(mmatrix)
         # print(ttrace)
         # print(matrix_values[len(lllnode)-1][len(llllnode)-1])
