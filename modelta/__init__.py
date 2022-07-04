@@ -110,7 +110,7 @@ class MultiTree:
             #print(self.nodeobj, end=' ')
             if flag == 1:
                 lll.append(self)
-                self.right.leaves(lll)
+                self.right.leaves(lll,1)
             else:
                 lll.append(self)
         else:
@@ -133,7 +133,7 @@ class MultiTree:
             #print(self.nodeobj, end=' ')
             if flag == 1:
                 lll.append(self)
-                self.right.leaves(lll)
+                self.right.leaves(lll,1)
             else:
                 lll.append(self)
         else:
@@ -288,8 +288,10 @@ def scoremat(TreeSeqFile:str,
             mv:float = 2.,
             Alg:str = 'KM',
             Tqdm:int = 1,
+            merge:int = 0,
             notebook:int = 0,
-            overlap:int = 0):
+            overlap:int = 0,
+            ):
     if Name2TypeFile != '':
         TreeSeqType = ReadTreeSeq_Name2Type(TreeSeqFile,Name2TypeFile)
         TreeSeqOri = ReadTreeSeq(TreeSeqFile)
@@ -313,6 +315,9 @@ def scoremat(TreeSeqFile:str,
     root1.Postorder_Level()
     lll = root1.nodes({}) #二维表示
     lllnode = [j for i in lll for j in i]
+    lllnode_obj = [j.nodeobj for i in lll for j in i]
+    # get root1 leaves' new label to celltype infos
+    root1_label2celltype = leafLable_to_celltype_info(lllnode)
 
     oroot1.CreatTree()
     oroot1.Postorder_Level()
@@ -330,6 +335,9 @@ def scoremat(TreeSeqFile:str,
     root2.Postorder_Level()
     llll = root2.nodes({}) #二维表示
     llllnode = [j for i in llll for j in i]
+    llllnode_obj = [j.nodeobj for i in lll for j in i]
+    # get root2 leaves' new label to celltype infos
+    root2_label2celltype = leafLable_to_celltype_info(llllnode)
 
     oroot2.CreatTree()
     oroot2.Postorder_Level()
@@ -396,7 +404,8 @@ def scoremat(TreeSeqFile:str,
                                                                         Algorithm=Alg,
                                                                         prune=pv,
                                                                         lll_label = [i.label for i in lll[0]],
-                                                                        llll_label = [i.label for i in llll[0]],)
+                                                                        llll_label = [i.label for i in llll[0]],
+                                                                        merge = merge,)
                         pbar.update(1)
     else:
         for loop_index in loopindex(root1.level+1,root2.level+1):
@@ -427,7 +436,8 @@ def scoremat(TreeSeqFile:str,
                                                                         Algorithm=Alg,
                                                                         prune=pv,
                                                                         lll_label = [i.label for i in lll[0]],
-                                                                        llll_label = [i.label for i in llll[0]],)
+                                                                        llll_label = [i.label for i in llll[0]],
+                                                                        merge = merge,)
     
     def changemat(rac, tracemat, tracemat_value, mat, list_tmp1, list_tmp2):
             for i in tracemat_value[tuple(rac)]:
@@ -449,6 +459,34 @@ def scoremat(TreeSeqFile:str,
                         #print(i)
                         changemat(i, tracemat,tracemat_value, mat, list_tmp1, list_tmp2)
             #return mat
+    def getmatchtree(rac, lllnode_obj, llllnode_obj, tracemat_value, mat, tree_tmp1, tree_tmp2):
+        for i in tracemat_value[tuple(rac)]:
+            if isinstance(i[0],int) and isinstance(i[1],int):
+                if i[0]<root1.leaf_count() and i[1] <root2.leaf_count():
+                    mat[tuple(i)] = -99999.
+                    if tree_tmp1[-1] == '(': #if tree_tmp2[-1] == '(':
+                        tree_tmp1.append(str(lllnode_obj[i[0]]))
+                        tree_tmp2.append(str(llllnode_obj[i[1]]))
+                    else:
+                        tree_tmp1.append(','+str(lllnode_obj[i[0]]))
+                        tree_tmp2.append(','+str(llllnode_obj[i[1]]))
+                else:
+                    mat[tuple(i)] = -99999.
+                    if tree_tmp1[-1] == '(':
+                        tree_tmp1.append('(')
+                        tree_tmp2.append('(')
+                    else:
+                        tree_tmp1.append(',')
+                        tree_tmp1.append('(')
+                        tree_tmp2.append(',')
+                        tree_tmp2.append('(')
+                    getmatchtree(i, lllnode_obj, llllnode_obj, tracemat_value, mat, tree_tmp1, tree_tmp2)
+                    tree_tmp1.append(')')
+                    tree_tmp2.append(')')
+            else:
+                tree_tmp1.append(lllnode_obj[rac[0]])
+                tree_tmp2.append(llllnode_obj[rac[1]])
+
     def where_prune(match_list:list, leaves_list:list):
         leaves_list_tmp = deepcopy(leaves_list)
         for i in leaves_list:
@@ -465,6 +503,14 @@ def scoremat(TreeSeqFile:str,
         mat_tmp[-1,-1] = -99999.
         changemat([-1,-1],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
         
+        mat_tmp2 = deepcopy(matrix_values)
+        tree_tmp1 = ['(']
+        tree_tmp2 = ['(']
+        mat_tmp2[-1,-1] = -99999.
+        getmatchtree([-1,-1],lllnode_obj, llllnode_obj, trace_value,mat_tmp2, tree_tmp1, tree_tmp2)
+        tree_tmp1.append(');')
+        tree_tmp2.append(');')
+        
         #list_tmp1.insert(0,root1.label)
         #list_tmp2.insert(0,root2.label)
         T1root_T2root.append({'Score':matrix_values[-1][-1],
@@ -476,16 +522,24 @@ def scoremat(TreeSeqFile:str,
                             'Root2_seq':oroot2.nodeobj,
                             'Root1_match': list_tmp1,
                             'Root2_match': list_tmp2,
+                            'Root1_match_tree': ''.join(tree_tmp1),
+                            'Root2_match_tree': ''.join(tree_tmp2),
                             'Root1_prune':where_prune(list_tmp1, list(map(lambda x:x.label,root1.leaves([])))),
                             'Root2_prune':where_prune(list_tmp2, list(map(lambda x:x.label,root2.leaves([])))),
                             'row':root1.node_count()-1, 
                             'col':root2.node_count()-1})
 
-        return({'matrix':mmatrix, 'T1root_T2root':T1root_T2root})
+        return({'matrix':mmatrix, 
+                'tree1_leaves_label': root1_label2celltype[0],
+                'tree1_leaves_celltype': root1_label2celltype[1],
+                'tree2_leaves_label': root2_label2celltype[0],
+                'tree2_leaves_celltype': root2_label2celltype[1],
+                'T1root_T2root':T1root_T2root})
         
     elif top > 0 and top < min(root1.node_count(), root2.node_count()):
 
         mat_tmp = deepcopy(matrix_values)
+        mat_tmp2 = deepcopy(matrix_values)
         scorelist=[]
         for jjj in range(top):
             #print(mat_tmp)
@@ -495,8 +549,13 @@ def scoremat(TreeSeqFile:str,
             
             list_tmp1 = []
             list_tmp2 = []
+            tree_tmp1 = ['(']
+            tree_tmp2 = ['(']
             mat_tmp[del_i_index,del_j_index] = -99999.
+            mat_tmp2[del_i_index,del_j_index] = -99999.
             changemat([del_i_index,del_j_index],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
+            getmatchtree([del_i_index,del_j_index],lllnode_obj, llllnode_obj, trace_value,mat_tmp2, tree_tmp1, tree_tmp2)
+            
             #if list_tmp1[0] != lllnode[del_i_index].label:
             #    list_tmp1.insert(0,lllnode[del_i_index].label)
             #if list_tmp2[0] != llllnode[del_j_index].label:    
@@ -516,8 +575,10 @@ def scoremat(TreeSeqFile:str,
                     list_tmp2 = []
                     mat_tmp[del_i_index,del_j_index] = -99999.
                     changemat([del_i_index,del_j_index],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
+                    getmatchtree([del_i_index,del_j_index],lllnode_obj, llllnode_obj, trace_value,mat_tmp2, tree_tmp1, tree_tmp2)
                     
-                 
+            tree_tmp1.append(');')
+            tree_tmp2.append(');')     
                 
             scorelist.append({'Score':maxscore,
                             'Root1_label':lllnode[del_i_index].label, 
@@ -528,12 +589,19 @@ def scoremat(TreeSeqFile:str,
                             'Root2_seq':ollllnode[del_j_index].nodeobj,
                             'Root1_match': list_tmp1,
                             'Root2_match': list_tmp2,
+                            'Root1_match_tree': ''.join(tree_tmp1),
+                            'Root2_match_tree': ''.join(tree_tmp2),
                             'Root1_prune':where_prune(list_tmp1, list(map(lambda x:x.label,lllnode[del_i_index].leaves([])))),
                             'Root2_prune':where_prune(list_tmp2, list(map(lambda x:x.label,llllnode[del_j_index].leaves([])))),
                             'row':del_i_index, 
                             'col':del_j_index})
 
-        return({'matrix':mmatrix, 'TopScoreList':scorelist})
+        return({'matrix':mmatrix, 
+                'tree1_leaves_label': root1_label2celltype[0],
+                'tree1_leaves_celltype': root1_label2celltype[1],
+                'tree2_leaves_label': root2_label2celltype[0],
+                'tree2_leaves_celltype': root2_label2celltype[1],
+                'TopScoreList':scorelist})
         
     else:
         print("Parameter top cannot be negative, or it might be out of range.")

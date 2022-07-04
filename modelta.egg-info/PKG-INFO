@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: modelta
-Version: 1.0.10
+Version: 1.0.18
 Summary: Chen and Yang Lab Multi fork Development cell lineage tree alignment 
 Home-page: https://github.com/Chenjy0212/modelta
 Author: EeWhile(Jingyu Chen)
@@ -328,7 +328,7 @@ usage: MODELTA [-h] [-nt NAME2TYPEFILE] [-nt2 NAME2TYPEFILE2] [-sd SCOREDICTFILE
                [-P PVALUE] [-a ALG] [-c CPUS]
                TreeSeqFile TreeSeqFile2
 
-Multi fork Development cell lineage tree alignment
+Yang Lab Multifuricating Developmental cEll Lineage Tree Alignment (mDELTA) algorithm
 
 positional arguments:
   TreeSeqFile           [path/filename] Cell lineage tree file with branch length information removed.

@@ -59,3 +59,16 @@ def QuantitativeScoreFile(ScoreFile, matchScore = -999.):
             score_dict[i[0]+ '_' + i[1]] = reverseScore(sum((abs(float(a)**2-float(b)**2)**0.5) for a,b in zip(typeXn_dict[i[0]],typeXn_dict[i[1]])),math.ceil(len(row)**0.5) if matchScore==-999. else matchScore)
     return score_dict
 
+## ================== add by lzz ========================
+def leafLable_to_celltype_info(node_list):
+    # get root1 leaves' new label to celltype infos
+    labels = []
+    celltypes = []
+    for each_node in node_list:
+        if "(" not in each_node.nodeobj:
+            labels.append(each_node.label)
+            celltypes.append(each_node.nodeobj)
+    ## conver to strings
+    
+    return ";".join(labels), ";".join(celltypes)
+ 

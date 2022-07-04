@@ -207,6 +207,7 @@ root    -1.0   -1.0   -1.0 -1.0   -1.0   -1.0 -1.0  2.0 -1.0  11.0  14.0}
 - `notebook`: [*bool* and `default`=*False*] Is it written and run in the jupyter notebook environment.
 - `Tqdm`: [*bool* and `default`=*True*] Whether to display the operation progress bar.
 - `overlap`: [*int > 0* and `default` = *0*] In the local results, the later comparison results cannot have X% or more node pairs that duplicate the previous results.
+- `merge`:  [*int > 0* and `default` = *0*] Merge internal node to prune.
 
 **if Qualitative calculation:**
 
@@ -337,6 +338,8 @@ optional arguments:
                         limited by local computer resources, it can reach the maximum number of local CPU cores - 1.
   -x overlap, --overlap overlap
                         [int > 0] 
+  -mg merge, --merge merge internal node to prune.
+                        [0(off) or 1(on)]
 
 
 Developer: Yang Lab(https://www.labxing.com/profile/10413), Details: https://github.com/Chenjy0212/modelta
