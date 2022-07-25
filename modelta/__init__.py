@@ -126,22 +126,22 @@ class MultiTree:
             return None
         elif self.left is None and self.right is None:
             #print(self.nodeobj, end=' ')
-            lll.append(self)
+            lll.append(self.label)
         elif self.right is None and self.left is not None:
-            self.left.leaves(lll, 1)
+            self.left.leaves_label_nodeobj(lll, 1)
         elif self.left is None and self.right is not None:
             #print(self.nodeobj, end=' ')
             if flag == 1:
-                lll.append(self)
-                self.right.leaves(lll,1)
+                lll.append(self.label)
+                self.right.leaves_label_nodeobj(lll,1)
             else:
-                lll.append(self)
+                lll.append(self.label)
         else:
             if flag == 1:
-                self.left.leaves(lll, 1)
-                self.right.leaves(lll)
+                self.left.leaves_label_nodeobj(lll, 1)
+                self.right.leaves_label_nodeobj(lll)
             else:
-                self.left.leaves(lll,1)
+                self.left.leaves_label_nodeobj(lll,1)
         return lll
     #生成树
     def CreatTree(self):
@@ -277,6 +277,30 @@ class MultiTree:
         if self.right is not None:
             self.right.inorder(data)
         return data
+
+def label_leaves_list_to_tree(label_list, tree_str):
+    str_tmp = ''
+    flag = 0
+    for i in tree_str:
+        if i == '(':
+            str_tmp += i
+        elif i == ';':
+            str_tmp += i
+        elif i == ',':
+            if str_tmp[-1] == ')':
+                str_tmp += '|'
+            else:
+                str_tmp += label_list[flag]
+                str_tmp += '|'
+                flag +=1
+        elif i == ')':
+            if str_tmp[-1] == ')':
+                str_tmp += i
+            else:
+                str_tmp += label_list[flag]
+                str_tmp += i
+                flag +=1
+    return str_tmp
 
 def scoremat(TreeSeqFile:str, 
             TreeSeqFile2:str, 
@@ -517,9 +541,11 @@ def scoremat(TreeSeqFile:str,
                             'Root1_label':root1.label, 
                             'Root1_node':root1.nodeobj,
                             'Root1_seq':oroot1.nodeobj,
+                            'Root1_label_node': label_leaves_list_to_tree(root1.leaves_label_nodeobj([]), root1.nodeobj),
                             'Root2_label':root2.label, 
                             'Root2_node':root2.nodeobj, 
                             'Root2_seq':oroot2.nodeobj,
+                            'Root2_label_node': label_leaves_list_to_tree(root2.leaves_label_nodeobj([]), root2.nodeobj),
                             'Root1_match': list_tmp1,
                             'Root2_match': list_tmp2,
                             'Root1_match_tree': ''.join(tree_tmp1),
@@ -584,9 +610,11 @@ def scoremat(TreeSeqFile:str,
                             'Root1_label':lllnode[del_i_index].label, 
                             'Root1_node':lllnode[del_i_index].nodeobj,
                             'Root1_seq':olllnode[del_i_index].nodeobj,
+                            'Root1_label_node': label_leaves_list_to_tree(lllnode[del_i_index].leaves_label_nodeobj([]), lllnode[del_i_index].nodeobj),
                             'Root2_label':llllnode[del_j_index].label, 
                             'Root2_node':llllnode[del_j_index].nodeobj, 
-                            'Root2_seq':ollllnode[del_j_index].nodeobj,
+                            'Root2_seq':ollllnode[del_j_index].nodeobj, 
+                            'Root2_label_node': label_leaves_list_to_tree(llllnode[del_j_index].leaves_label_nodeobj([]), llllnode[del_j_index].nodeobj),
                             'Root1_match': list_tmp1,
                             'Root2_match': list_tmp2,
                             'Root1_match_tree': ''.join(tree_tmp1),
