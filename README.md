@@ -1,5 +1,6 @@
 <ul style="80%; "><img alt="logo" src="./image/mDELTAt.png" width=40% style="float:right; padding:40px"/>
 </ul>
+
 # mDELTA
 
 - mDELTA is an algorithm for *m*ultifuricating *D*evelopmental c*E*ll *L*ineage *T*ree *A*lignment. In essence, it compares two rooted, unordered, tip-labeled trees, and finds the best global / local correspondence between the nodes. The mDELTA program analyzes developmental cell lineage trees reconstructed through single-cell DNA barcoding (such as using scGESTALT or SMALT, while greater cellular coverage is expected to yield more meaningful mDELTA alignments).
