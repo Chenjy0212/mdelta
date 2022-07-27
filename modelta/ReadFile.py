@@ -4,37 +4,48 @@ import csv
 from itertools import islice
 import math
 
-# 读取 .nwk类文件并把谱系树中的节点名称转换为类型
+# 读取 .nwk类文件并把谱系树中的节点名称转换为类�?
 # 例如   (a1,b7); ---> (a,b);
 def ReadTreeSeq_Name2Type(TreeSeqFilePath, Name2TypeFilePath):
-    file1= open(TreeSeqFilePath,encoding='utf-8') #读取到文本的所有内容
+    file1= open(TreeSeqFilePath,encoding='utf-8') #读取到文本的所有内�?
     content=file1.read()
     #print(content)
-    file2 = csv.reader(open(Name2TypeFilePath))
-    for line in islice(file2, 1, None):
-        name, ctype = line
-        content = content.replace(name, ctype)
+    file2= open(Name2TypeFilePath,encoding='utf-8')
+    file2.readline() #跳过第一�?
+    while True:
+        text_line = file2.readline().replace('\n', '')
+        if text_line:
+            #print(len(text_line), text_line)
+            name2type = text_line.split(',', 1 )
+            #print(name2type)
+            name = name2type[0]
+            ctype = name2type[1]
+            #print('name:',name,'\t','type:',type)
+            content = content.replace(name, ctype)
+            #print(content)
+        else:
+            break
+    #print(content)
     return content.replace(';', '')
 
 def ReadTreeSeq(TreeSeqFilePath):
-    file1= open(TreeSeqFilePath,encoding='utf-8') #读取到文本的所有内容
+    file1= open(TreeSeqFilePath,encoding='utf-8') #读取到文本的所有内�?
     content=file1.read()
     #print(content)
     return content.replace(';', '')
 
 def Scoredict(lllleaf, llllleaf, mv:float):
-    #如果是自动生成的话
-    #可以用到笛卡尔积
     score_dict = {}
     #for i in itertools.product(set(lllleaf), set(llllleaf)):
     #    score_dict[i[0].nodeobj+'_'+i[1].nodeobj] = float(random.randint(-2,2))
     #score_dict[i[0].nodeobj+'_'+i[1].nodeobj] = random.random()/10
     #print(score_dict)
 
-    #或者用到相同节点才匹配
     #score_dict = {}
-    for i in lllleaf + llllleaf:
-        score_dict[i.nodeobj+'_'+i.nodeobj] = mv
+    for i in lllleaf:
+        score_dict[i.nodeobj+'_'+i.nodeobj] = float(mv)
+    for i in llllleaf:
+        score_dict[i.nodeobj+'_'+i.nodeobj] = float(mv)
     return score_dict
 
 def reverseScore(Score, matchScore:float):
@@ -42,14 +53,19 @@ def reverseScore(Score, matchScore:float):
     Score =matchScore-(Score**0.5)
     return Score
 
-def QuantitativeScoreFile(ScoreFile, matchScore = -999.):
+def QuantitativeScoreFile(lllleaf, llllleaf, mv, ScoreFile, matchScore = -999.):
     score_dict={}
+    for i in lllleaf:
+        score_dict[i.nodeobj+'_'+i.nodeobj] = float(mv)
+    for i in llllleaf:
+        score_dict[i.nodeobj+'_'+i.nodeobj] = float(mv)
     typeXn_dict = {}
     csv_reader=csv.reader(open(ScoreFile,encoding='utf-8'))
-    for row in islice(csv_reader, 1, None): #跳过第一行名称信息
+    for row in islice(csv_reader, 1, None): #跳过第一行名称信�?
         #print(row)
         if len(row) == 3:
-            score_dict[row[0]+ '_' + row[1]] = row[2]
+            score_dict[row[0]+ '_' + row[1]] = float(row[2])
+            score_dict[row[1]+ '_' + row[0]] = float(row[2])
         else:
             typeXn_dict[row[0]]=row[1:]
         #print(list(typeXn_dict.keys()))
@@ -71,4 +87,3 @@ def leafLable_to_celltype_info(node_list):
     ## conver to strings
     
     return ";".join(labels), ";".join(celltypes)
- 

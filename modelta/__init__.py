@@ -97,52 +97,62 @@ class MultiTree:
         else:
             return 1 + max(self.left.height(), self.right.height())
     # 原来的多叉树的叶子节点
-    def leaves(self,ll=[], flag = 0):
-        lll = ll
-        if self.nodeobj is None:
+    def leaves(self,ll=[],flag = 1): #意味 0 这个是叶子节点
+        if self is None:
             return None
-        elif self.left is None and self.right is None:
-            #print(self.nodeobj, end=' ')
-            lll.append(self)
-        elif self.right is None and self.left is not None:
-            self.left.leaves(lll,flag = 1)
-        elif self.left is None and self.right is not None:
-            #print(self.nodeobj, end=' ')
-            if flag == 1:
-                lll.append(self)
-                self.right.leaves(lll,1)
+        if flag == 1:
+            if self.left is None:
+                ll.append(self)
+                return ll
             else:
-                lll.append(self)
-        else:
-            if flag == 1:
-                self.left.leaves(lll, 1)
-                self.right.leaves(lll)
-            else:
-                self.left.leaves(lll,1)
-        return lll
-    def leaves_label_nodeobj(self,ll=[], flag = 0):
-        lll = ll
-        if self.nodeobj is None:
+                self = self.left
+        
+        if self.left is not None:
+            self.left.leaves(ll,flag = 0)
+        if self.nodeobj is not None:
+            if self.left is None:
+                ll.append(self)
+        if self.right is not None:
+            self.right.leaves(ll,flag = 0)
+        return ll
+        
+    def leaves_nodeobj(self,ll=[],flag = 1): #意味 0 这个是叶子节点
+        if self is None:
             return None
-        elif self.left is None and self.right is None:
-            #print(self.nodeobj, end=' ')
-            lll.append(self.label)
-        elif self.right is None and self.left is not None:
-            self.left.leaves_label_nodeobj(lll, 1)
-        elif self.left is None and self.right is not None:
-            #print(self.nodeobj, end=' ')
-            if flag == 1:
-                lll.append(self.label)
-                self.right.leaves_label_nodeobj(lll,1)
+        if flag == 1:
+            if self.left is None:
+                ll.append(self.nodeobj)
+                return ll
             else:
-                lll.append(self.label)
-        else:
-            if flag == 1:
-                self.left.leaves_label_nodeobj(lll, 1)
-                self.right.leaves_label_nodeobj(lll)
+                self = self.left
+        
+        if self.left is not None:
+            self.left.leaves_nodeobj(ll,flag = 0)
+        if self.nodeobj is not None:
+            if self.left is None:
+                ll.append(self.nodeobj)
+        if self.right is not None:
+            self.right.leaves_nodeobj(ll,flag = 0)
+        return ll
+    
+    def leaves_label(self,ll=[],flag = 1): #意味 0 这个是叶子节点
+        if self is None:
+            return None
+        if flag == 1:
+            if self.left is None:
+                ll.append(self.label)
+                return ll
             else:
-                self.left.leaves_label_nodeobj(lll,1)
-        return lll
+                self = self.left
+        
+        if self.left is not None:
+            self.left.leaves_label(ll,flag = 0)
+        if self.nodeobj is not None:
+            if self.left is None:
+                ll.append(self.label)
+        if self.right is not None:
+            self.right.leaves_label(ll,flag = 0)
+        return ll
     #生成树
     def CreatTree(self):
         if(self.nodeobj[0] == '('): #存在括号意味着还没达到叶子结点
@@ -202,39 +212,35 @@ class MultiTree:
         if self.nodeobj is not None:
             self.Level()
     #叶子节点个数,需要的是节点下的左节点才正确
-    def leaf_count(self,flag=1):
+    def leaf_count(self, flag = 1):
         if self is None:
             return 0
-        elif self.left is None and self.right is None:
-            return 1
         if flag == 1:
-            self = self.left
-        if self is None:
-            return 1
+            if self.left is None:
+                return 1
+            else:
+                self = self.left
         if self.left is None and self.right is None:
             return 1
+        elif self.right is not None and self.left is not None:
+            return self.left.leaf_count(flag = 0) + self.right.leaf_count(flag = 0)
         elif self.left is None and self.right is not None:
-            return 1 + self.right.leaf_count(0)
+            return 1 + self.right.leaf_count(flag = 0)
         elif self.right is None and self.left is not None:
-            return self.left.leaf_count(0)
-        else:
-            return self.left.leaf_count(0) + self.right.leaf_count(0)
+            return self.left.leaf_count(flag = 0)
         
     #总节点个数
-    def node_count(self, flag = 0):
+    def node_count(self):
         if self is None:
             return 0
         elif self.left is None and self.right is None:
             return 1
         elif self.left is not None and self.right is not None:
-            if flag == 1:
-                return 1 + self.left.node_count(1) + self.right.node_count()
-            else:
-                return 1 + self.left.node_count()
+            return 1 + self.left.node_count() + self.right.node_count()
         elif self.left is None and self.right is not None:
             return 1 + self.right.node_count()
         elif self.right is None and self.left is not None:
-            return 1 + self.left.node_count(1)
+            return 1 + self.left.node_count()
         #else:
             #return self.left.node_count()+ self.right.node_count()
     #获取当前节点一级子节点个数
@@ -347,6 +353,7 @@ def scoremat(TreeSeqFile:str,
     oroot1.Postorder_Level()
     olll = oroot1.nodes({}) #二维表示
     olllnode = [j for i in olll for j in i]
+    oroot1_label2celltype = leafLable_to_celltype_info(olllnode)
 
     lllloop = []
     for i in lll:
@@ -359,7 +366,7 @@ def scoremat(TreeSeqFile:str,
     root2.Postorder_Level()
     llll = root2.nodes({}) #二维表示
     llllnode = [j for i in llll for j in i]
-    llllnode_obj = [j.nodeobj for i in lll for j in i]
+    llllnode_obj = [j.nodeobj for i in llll for j in i]
     # get root2 leaves' new label to celltype infos
     root2_label2celltype = leafLable_to_celltype_info(llllnode)
 
@@ -367,6 +374,7 @@ def scoremat(TreeSeqFile:str,
     oroot2.Postorder_Level()
     ollll = oroot2.nodes({}) #二维表示
     ollllnode = [j for i in ollll for j in i]
+    oroot2_label2celltype = leafLable_to_celltype_info(ollllnode)
 
     llllloop = []
     for i in llll:
@@ -378,7 +386,7 @@ def scoremat(TreeSeqFile:str,
     if ScoreDictFile == '': 
         score_dict = Scoredict(root1.leaves([]),root2.leaves([]), mv)
     else:
-        score_dict = QuantitativeScoreFile(ScoreDictFile)
+        score_dict = QuantitativeScoreFile(root1.leaves([]),root2.leaves([]),mv,ScoreDictFile)
 
     mmatrix = pd.DataFrame([[0.0 for i in range(len(llllnode))] for j in range(len(lllnode))],
                         index=[i.label for i in lllnode],
@@ -541,11 +549,11 @@ def scoremat(TreeSeqFile:str,
                             'Root1_label':root1.label, 
                             'Root1_node':root1.nodeobj,
                             'Root1_seq':oroot1.nodeobj,
-                            'Root1_label_node': label_leaves_list_to_tree(root1.leaves_label_nodeobj([]), root1.nodeobj),
+                            #'Root1_label_node': label_leaves_list_to_tree(root1.leaves_label([]), root1.nodeobj),
                             'Root2_label':root2.label, 
                             'Root2_node':root2.nodeobj, 
                             'Root2_seq':oroot2.nodeobj,
-                            'Root2_label_node': label_leaves_list_to_tree(root2.leaves_label_nodeobj([]), root2.nodeobj),
+                            #'Root2_label_node': label_leaves_list_to_tree(root2.leaves_label([]), root2.nodeobj),
                             'Root1_match': list_tmp1,
                             'Root2_match': list_tmp2,
                             'Root1_match_tree': ''.join(tree_tmp1),
@@ -556,10 +564,13 @@ def scoremat(TreeSeqFile:str,
                             'col':root2.node_count()-1})
 
         return({'matrix':mmatrix, 
+                'tree1_leaves_nodename': oroot1_label2celltype[1],
                 'tree1_leaves_label': root1_label2celltype[0],
                 'tree1_leaves_celltype': root1_label2celltype[1],
+                'tree2_leaves_nodename': oroot2_label2celltype[1],
                 'tree2_leaves_label': root2_label2celltype[0],
                 'tree2_leaves_celltype': root2_label2celltype[1],
+                'score_dict':score_dict,
                 'T1root_T2root':T1root_T2root})
         
     elif top > 0 and top < min(root1.node_count(), root2.node_count()):
@@ -610,11 +621,11 @@ def scoremat(TreeSeqFile:str,
                             'Root1_label':lllnode[del_i_index].label, 
                             'Root1_node':lllnode[del_i_index].nodeobj,
                             'Root1_seq':olllnode[del_i_index].nodeobj,
-                            'Root1_label_node': label_leaves_list_to_tree(lllnode[del_i_index].leaves_label_nodeobj([]), lllnode[del_i_index].nodeobj),
+                            #'Root1_label_node': label_leaves_list_to_tree(lllnode[del_i_index].leaves_label([]), lllnode[del_i_index].nodeobj),
                             'Root2_label':llllnode[del_j_index].label, 
                             'Root2_node':llllnode[del_j_index].nodeobj, 
                             'Root2_seq':ollllnode[del_j_index].nodeobj, 
-                            'Root2_label_node': label_leaves_list_to_tree(llllnode[del_j_index].leaves_label_nodeobj([]), llllnode[del_j_index].nodeobj),
+                            #'Root2_label_node': label_leaves_list_to_tree(llllnode[del_j_index].leaves_label([]), llllnode[del_j_index].nodeobj),
                             'Root1_match': list_tmp1,
                             'Root2_match': list_tmp2,
                             'Root1_match_tree': ''.join(tree_tmp1),
@@ -625,11 +636,15 @@ def scoremat(TreeSeqFile:str,
                             'col':del_j_index})
 
         return({'matrix':mmatrix, 
+                'tree1_leaves_nodename': oroot1_label2celltype[1],
                 'tree1_leaves_label': root1_label2celltype[0],
                 'tree1_leaves_celltype': root1_label2celltype[1],
+                'tree2_leaves_nodename': oroot2_label2celltype[1],
                 'tree2_leaves_label': root2_label2celltype[0],
                 'tree2_leaves_celltype': root2_label2celltype[1],
+                'score_dict':score_dict,
                 'TopScoreList':scorelist})
         
     else:
         print("Parameter top cannot be negative, or it might be out of range.")
+        print("root1_nodecount:",root1.node_count(), "root2_nodecount:",root2.node_count())

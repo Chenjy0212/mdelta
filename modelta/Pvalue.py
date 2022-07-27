@@ -104,52 +104,62 @@ class MultiTree:
             return 1 + max(self.left.height(), self.right.height())
     # 鍘熸潵鐨勫鍙夋爲鐨勫彾瀛愯妭鐐?
 
-    def leaves(self,ll=[], flag = 0):
-        lll = ll
-        if self.nodeobj is None:
+    def leaves(self,ll=[],flag = 1): #意味 0 这个是叶子节点
+        if self is None:
             return None
-        elif self.left is None and self.right is None:
-            #print(self.nodeobj, end=' ')
-            lll.append(self)
-        elif self.right is None and self.left is not None:
-            self.left.leaves(lll,flag = 1)
-        elif self.left is None and self.right is not None:
-            #print(self.nodeobj, end=' ')
-            if flag == 1:
-                lll.append(self)
-                self.right.leaves(lll,1)
+        if flag == 1:
+            if self.left is None:
+                ll.append(self)
+                return ll
             else:
-                lll.append(self)
-        else:
-            if flag == 1:
-                self.left.leaves(lll, 1)
-                self.right.leaves(lll)
-            else:
-                self.left.leaves(lll,1)
-        return lll
-    def leaves_label_nodeobj(self,ll=[], flag = 0):
-        lll = ll
-        if self.nodeobj is None:
+                self = self.left
+        
+        if self.left is not None:
+            self.left.leaves(ll,flag = 0)
+        if self.nodeobj is not None:
+            if self.left is None:
+                ll.append(self)
+        if self.right is not None:
+            self.right.leaves(ll,flag = 0)
+        return ll
+        
+    def leaves_nodeobj(self,ll=[],flag = 1): #意味 0 这个是叶子节点
+        if self is None:
             return None
-        elif self.left is None and self.right is None:
-            #print(self.nodeobj, end=' ')
-            lll.append(self)
-        elif self.right is None and self.left is not None:
-            self.left.leaves(lll, 1)
-        elif self.left is None and self.right is not None:
-            #print(self.nodeobj, end=' ')
-            if flag == 1:
-                lll.append(self)
-                self.right.leaves(lll,1)
+        if flag == 1:
+            if self.left is None:
+                ll.append(self.nodeobj)
+                return ll
             else:
-                lll.append(self)
-        else:
-            if flag == 1:
-                self.left.leaves(lll, 1)
-                self.right.leaves(lll)
+                self = self.left
+        
+        if self.left is not None:
+            self.left.leaves_nodeobj(ll,flag = 0)
+        if self.nodeobj is not None:
+            if self.left is None:
+                ll.append(self.nodeobj)
+        if self.right is not None:
+            self.right.leaves_nodeobj(ll,flag = 0)
+        return ll
+    
+    def leaves_label(self,ll=[],flag = 1): #意味 0 这个是叶子节点
+        if self is None:
+            return None
+        if flag == 1:
+            if self.left is None:
+                ll.append(self.label)
+                return ll
             else:
-                self.left.leaves(lll,1)
-        return lll
+                self = self.left
+        
+        if self.left is not None:
+            self.left.leaves_label(ll,flag = 0)
+        if self.nodeobj is not None:
+            if self.left is None:
+                ll.append(self.label)
+        if self.right is not None:
+            self.right.leaves_label(ll,flag = 0)
+        return ll
 
     def CreatTree(self):
         if(self.nodeobj[0] == '('):  # 瀛樺湪鎷彿鎰忓懗鐫€杩樻病杈惧埌鍙跺瓙缁撶偣
@@ -215,23 +225,22 @@ class MultiTree:
             self.Level()
     # 鍙跺瓙鑺傜偣涓暟,闇€瑕佺殑鏄妭鐐逛笅鐨勫乏鑺傜偣鎵嶆纭?
 
-    def leaf_count(self, flag=1):
+    def leaf_count(self, flag = 1):
         if self is None:
             return 0
-        elif self.left is None and self.right is None:
-            return 1
         if flag == 1:
-            self = self.left
-        if self is None:
-            return 1
+            if self.left is None:
+                return 1
+            else:
+                self = self.left
         if self.left is None and self.right is None:
             return 1
+        elif self.right is not None and self.left is not None:
+            return self.left.leaf_count(flag = 0) + self.right.leaf_count(flag = 0)
         elif self.left is None and self.right is not None:
-            return 1 + self.right.leaf_count(0)
+            return 1 + self.right.leaf_count(flag = 0)
         elif self.right is None and self.left is not None:
-            return self.left.leaf_count(0)
-        else:
-            return self.left.leaf_count(0) + self.right.leaf_count(0)
+            return self.left.leaf_count(flag = 0)
 
     #总节点个数
     def node_count(self, flag = 0):

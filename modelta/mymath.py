@@ -72,11 +72,10 @@ def GetMaxScore(trace,
                 local_matrix_root2_index,
                 lll_label,
                 llll_label,
-                merge:int,
                 prune=-1.,
                 dict_score={},
                 Algorithm:str = 'KM',
-                
+                merge = 0
                 ):
     # 如果两棵树都是，即是根节点也是叶节点（单一元素），直接查字典，查不到就划归为罚分值prune
     root1node = root1
@@ -87,9 +86,9 @@ def GetMaxScore(trace,
     if root1node.left == None and root2node.left == None:
         #路径只能是节点直接匹配
         if key in dict_score:
-            if dict_score[key] > prune:
+            if float(dict_score[key]) > prune:
                 trace[root1_index][root2_index].append([root1.nodeobj,root2.nodeobj])
-            return dict_score[key]
+            return float(dict_score[key])
         else:
             dict_score[key] = score
             dict_score[key2]= score
@@ -98,7 +97,7 @@ def GetMaxScore(trace,
     elif root1node.left == None and root2node.left is not None:
         #if key in dict_score:
         #    return dict_score[key]
-        if (dict_score[root1node.nodeobj+'_'+root1node.nodeobj]+prune*(root2node.leaf_count()-1) < prune):
+        if (float(dict_score[root1node.nodeobj+'_'+root1node.nodeobj])+prune*(root2node.leaf_count()-1) < prune):
             #dict_score[key] = score
             #dict_score[key2] = score
             return score
@@ -125,7 +124,7 @@ def GetMaxScore(trace,
         #if key in dict_score:
         #    return dict_score[key]
         #print(max(local_matrix))
-        if (dict_score[root2node.nodeobj+'_'+root2node.nodeobj]+prune*(root1node.leaf_count()-1) < prune):
+        if (float(dict_score[root2node.nodeobj+'_'+root2node.nodeobj])+prune*(root1node.leaf_count()-1) < prune):
             #dict_score[key] = score
             #dict_score[key2] = score
             return score
@@ -149,17 +148,17 @@ def GetMaxScore(trace,
             return score
     #两个树都是非叶子结点
     else:
-        summ = 0
+        summ = 0.
         r1leaf = root1node.leaf_count()
         r2leaf = root2node.leaf_count()
         if r1leaf >= r2leaf:
             for i in root2node.leaves([]):
-                summ += dict_score[i.nodeobj+'_'+i.nodeobj]
+                summ += float(dict_score[i.nodeobj+'_'+i.nodeobj])
             if (summ + prune*(r1leaf-r2leaf) < r2leaf*prune):
                 return r2leaf*prune
         else:
             for i in root1node.leaves([]):
-                summ += dict_score[i.nodeobj+'_'+i.nodeobj]
+                summ += float(dict_score[i.nodeobj+'_'+i.nodeobj])
             if (summ + prune*(r2leaf-r1leaf) < r1leaf*prune):
                 return r1leaf*prune
         
@@ -197,7 +196,7 @@ def GetMaxScore(trace,
                     trace_tmp.append([local_matrix_root1_index[row],local_matrix_root2_index[column]])
                 #print(f'({row}, {column}) -> {value}')
             #print('total profit= ',total)
-            score = total+abs(r1leaf-r2leaf)*prune
+            score = total +abs(local_matrix.shape[0] - local_matrix.shape[1])*prune
             if score > min(r1leaf,r2leaf)*prune:
                 trace[root1_index][root2_index]=trace_tmp
             else:
@@ -221,8 +220,8 @@ def GetMaxScore(trace,
                     trace[root1_index][root2_index].clear()
                     trace[root1_index][root2_index].append([root1_index,j[1]])
                 #score = max(allmatrix[root1_index,j[1]] + prune*(r2leaf - j[0].leaf_count()), score)      
-
-        if (merge == 1):
+        
+        if merge != 0:
             #print(root1.label, root1.node_count(), root2.label, root2.node_count())
             #print(root1.node_count() - root1.leaf_count() - 1, root2.node_count() - root2.leaf_count() - 1)
             #print(root1.nodeobj, root2.nodeobj)
@@ -254,7 +253,7 @@ def GetMaxScore(trace,
             score_tmpp = ((root1.node_count() - root1.leaf_count() - 1) + (root2.node_count() - root2.leaf_count() - 1) + abs(root1.leaf_count() - root2.leaf_count())) * prune
             #print(abs(root1.leaf_count() - root2.leaf_count()))
             for x in a:
-                score_tmpp += dict_score[x+'_'+x]
+                score_tmpp += float(dict_score[x+'_'+x])
             
             if score_tmpp > score:
                 score = score_tmpp
