@@ -16,7 +16,7 @@ class MultiTree:
         self.right = None
         self.level = level
         self.label = label
-    # å‰åºéå†,è·å–æŒ‰ç…§å±‚çº§æ’åºçš„å…¨èŠ‚ç‚¹åºåˆ—å¯¹ [node:level]
+    # Ç°Ğò±éÀú,»ñÈ¡°´ÕÕ²ã¼¶ÅÅĞòµÄÈ«½ÚµãĞòÁĞ¶Ô [node:level]
     def nodes(self,ll={}):
         lll= ll 
         if self.nodeobj is not None:
@@ -32,7 +32,7 @@ class MultiTree:
         for i in lll: 
             llist[i[1]].append(i[0])
         return llist
-    # ååºéå†_å¾—åˆ°nodeobj:levelå¯¹
+    # ºóĞò±éÀú_µÃµ½nodeobj:level¶Ô
     def postorder(self):
         if self.left is not None:
             self.left.postorder()
@@ -40,7 +40,7 @@ class MultiTree:
             self.right.postorder()
         if self.nodeobj is not None:
             print(self.nodeobj,' Level:',self.level,' Label:',self.label)
-    # å‰åºéå†_å¾—åˆ°nodeobj:levelå¯¹
+    # Ç°Ğò±éÀú_µÃµ½nodeobj:level¶Ô
     def preorder(self):
         if self.nodeobj is not None:
             print(self.nodeobj,' Level:',self.level,' Label:',self.label)
@@ -48,44 +48,44 @@ class MultiTree:
             self.left.preorder()
         if self.right is not None:
             self.right.preorder()
-    # å±‚åºéå†
+    # ²ãĞò±éÀú
     def levelorder(self):
-        # è¿”å›æŸä¸ªèŠ‚ç‚¹çš„å·¦å­©å­
+        # ·µ»ØÄ³¸ö½ÚµãµÄ×óº¢×Ó
         def LChild_Of_Node(node):
             return node.left if node.left is not None else None
-        # è¿”å›æŸä¸ªèŠ‚ç‚¹çš„å³å­©å­
+        # ·µ»ØÄ³¸ö½ÚµãµÄÓÒº¢×Ó
         def RChild_Of_Node(node):
             return node.right if node.right is not None else None
-        # å±‚åºéå†åˆ—è¡¨
+        # ²ãĞò±éÀúÁĞ±í
         level_order = []
-        # æ˜¯å¦æ·»åŠ æ ¹èŠ‚ç‚¹ä¸­çš„æ•°æ®
+        # ÊÇ·ñÌí¼Ó¸ù½ÚµãÖĞµÄÊı¾İ
         if self.nodeobj is not None:
             level_order.append([self])
-        # äºŒå‰æ ‘çš„é«˜åº¦
+        # ¶ş²æÊ÷µÄ¸ß¶È
         height = self.height()
         if height >= 1:
-            # å¯¹ç¬¬äºŒå±‚åŠå…¶ä»¥åçš„å±‚æ•°è¿›è¡Œæ“ä½œ, åœ¨level_orderä¸­æ·»åŠ èŠ‚ç‚¹è€Œä¸æ˜¯æ•°æ®
+            # ¶ÔµÚ¶ş²ã¼°ÆäÒÔºóµÄ²ãÊı½øĞĞ²Ù×÷, ÔÚlevel_orderÖĞÌí¼Ó½Úµã¶ø²»ÊÇÊı¾İ
             for _ in range(2, height + 1):
-                level = []  # ç’‡ãƒ¥çœ°é¨å‹®å¦­é?
+                level = []  # è¯¥å±‚çš„èŠ‚ç‚?
                 for node in level_order[-1]:
-                    # å¦‚æœå·¦å­©å­éç©ºï¼Œåˆ™æ·»åŠ å·¦å­©å­
+                    # Èç¹û×óº¢×Ó·Ç¿Õ£¬ÔòÌí¼Ó×óº¢×Ó
                     if LChild_Of_Node(node):
                         level.append(LChild_Of_Node(node))
-                    # å¦‚æœå³å­©å­éç©ºï¼Œåˆ™æ·»åŠ å³å­©å­
+                    # Èç¹ûÓÒº¢×Ó·Ç¿Õ£¬ÔòÌí¼ÓÓÒº¢×Ó
                     if RChild_Of_Node(node):
                         level.append(RChild_Of_Node(node))
-                # å¦‚æœè¯¥å±‚éç©ºï¼Œåˆ™æ·»åŠ è¯¥å±‚
+                # Èç¹û¸Ã²ã·Ç¿Õ£¬ÔòÌí¼Ó¸Ã²ã
                 if level:
                     level_order.append(level)
 
-             # å–å‡ºæ¯å±‚ä¸­çš„æ•°æ®
-            for i in range(0, height):  # å±‚æ•°
+             # È¡³öÃ¿²ãÖĞµÄÊı¾İ
+            for i in range(0, height):  # ²ãÊı
                 for index in range(len(level_order[i])):
                     level_order[i][index] = level_order[i][index].nodeobj
         return level_order
-    # äºŒå‰æ ‘çš„é«˜åº¦
+    # ¶ş²æÊ÷µÄ¸ß¶È
     def height(self):
-        # ç©ºçš„æ ‘é«˜åº¦ä¸º0, åªæœ‰rootèŠ‚ç‚¹çš„æ ‘é«˜åº¦ä¸º1
+        # ¿ÕµÄÊ÷¸ß¶ÈÎª0, Ö»ÓĞroot½ÚµãµÄÊ÷¸ß¶ÈÎª1
         if self.nodeobj is None:
             return 0
         elif self.left is None and self.right is None:
@@ -96,8 +96,8 @@ class MultiTree:
             return 1 + self.left.height()
         else:
             return 1 + max(self.left.height(), self.right.height())
-    # åŸæ¥çš„å¤šå‰æ ‘çš„å¶å­èŠ‚ç‚¹
-    def leaves(self,ll=[],flag = 1): #æ„å‘³ 0 è¿™ä¸ªæ˜¯å¶å­èŠ‚ç‚¹
+    # Ô­À´µÄ¶à²æÊ÷µÄÒ¶×Ó½Úµã
+    def leaves(self,ll=[],flag = 1): #ÒâÎ¶ 0 Õâ¸öÊÇÒ¶×Ó½Úµã
         if self is None:
             return None
         if flag == 1:
@@ -116,7 +116,7 @@ class MultiTree:
             self.right.leaves(ll,flag = 0)
         return ll
         
-    def leaves_nodeobj(self,ll=[],flag = 1): #æ„å‘³ 0 è¿™ä¸ªæ˜¯å¶å­èŠ‚ç‚¹
+    def leaves_nodeobj(self,ll=[],flag = 1): #ÒâÎ¶ 0 Õâ¸öÊÇÒ¶×Ó½Úµã
         if self is None:
             return None
         if flag == 1:
@@ -135,7 +135,7 @@ class MultiTree:
             self.right.leaves_nodeobj(ll,flag = 0)
         return ll
     
-    def leaves_label(self,ll=[],flag = 1): #æ„å‘³ 0 è¿™ä¸ªæ˜¯å¶å­èŠ‚ç‚¹
+    def leaves_label(self,ll=[],flag = 1): #ÒâÎ¶ 0 Õâ¸öÊÇÒ¶×Ó½Úµã
         if self is None:
             return None
         if flag == 1:
@@ -153,12 +153,12 @@ class MultiTree:
         if self.right is not None:
             self.right.leaves_label(ll,flag = 0)
         return ll
-    #ç”Ÿæˆæ ‘
+    #Éú³ÉÊ÷
     def CreatTree(self):
-        if(self.nodeobj[0] == '('): #å­˜åœ¨æ‹¬å·æ„å‘³ç€è¿˜æ²¡è¾¾åˆ°å¶å­ç»“ç‚¹
+        if(self.nodeobj[0] == '('): #´æÔÚÀ¨ºÅÒâÎ¶×Å»¹Ã»´ïµ½Ò¶×Ó½áµã
             node_list = []
-            brackets_num = 0 #æ‹¬å·ä¸ªæ•°
-            node_num = 0 #èŠ‚ç‚¹åºå·
+            brackets_num = 0 #À¨ºÅ¸öÊı
+            node_num = 0 #½ÚµãĞòºÅ
             node_tmp = ''
             for i in self.nodeobj[1:-1]:
                 if i == '(':
@@ -174,13 +174,13 @@ class MultiTree:
                 else:
                     node_tmp += i
             node_list.append(node_tmp)   
-            #print(node_list)    #æŸ¥çœ‹æ‹†åˆ†åçš„èŠ‚ç‚¹åºåˆ—
+            #print(node_list)    #²é¿´²ğ·ÖºóµÄ½ÚµãĞòÁĞ
             self_tmp = self
             for index,item in enumerate(node_list):
                 if index == 0:
-                #ç¬¬ä¸€ä¸ªå­èŠ‚ç‚¹éƒ½æ˜¯çˆ¶èŠ‚ç‚¹çš„å·¦èŠ‚ç‚¹
-                #åç»­å­èŠ‚ç‚¹å°±æ˜¯ä¸Šä¸€ä¸ªå­èŠ‚ç‚¹çš„å³èŠ‚ç‚¹ 
-                #èµ‹äºˆlabel
+                #µÚÒ»¸ö×Ó½Úµã¶¼ÊÇ¸¸½ÚµãµÄ×ó½Úµã
+                #ºóĞø×Ó½Úµã¾ÍÊÇÉÏÒ»¸ö×Ó½ÚµãµÄÓÒ½Úµã 
+                #¸³Óèlabel
                     label = str(index) if self.label == 'root' else self_tmp.label+','+str(index)    
                     self.left = MultiTree(item,label=label)
                     self = self.left
@@ -190,17 +190,17 @@ class MultiTree:
                     self.right = MultiTree(item,label=label)
                     self = self.right
                     self.CreatTree()
-    #èµ‹å±‚å·¦å­æ ‘ååºéå†æ‰¾å‡ºæœ€å¤§å±‚çº§d
+    #¸³²ã×ó×ÓÊ÷ºóĞò±éÀúÕÒ³ö×î´ó²ã¼¶d
     def Posorder_Max_Level(self):
         level = self.level;
         while self.right:
-            #æœ‰å³å­æ ‘å°±æ˜¯æœ‰å…„å¼Ÿç»“ç‚¹
+            #ÓĞÓÒ×ÓÊ÷¾ÍÊÇÓĞĞÖµÜ½áµã
             level = max(level, self.right.level)
             self = self.right
         return level
-    #èµ‹äºˆå±‚çº§level
+    #¸³Óè²ã¼¶level
     def Level(self):
-        if self.left == None: #å¶å­èŠ‚ç‚¹
+        if self.left == None: #Ò¶×Ó½Úµã
             self.level = 0
         else:
             self.level = self.left.Posorder_Max_Level()+1
@@ -211,7 +211,7 @@ class MultiTree:
             self.right.Postorder_Level()
         if self.nodeobj is not None:
             self.Level()
-    #å¶å­èŠ‚ç‚¹ä¸ªæ•°,éœ€è¦çš„æ˜¯èŠ‚ç‚¹ä¸‹çš„å·¦èŠ‚ç‚¹æ‰æ­£ç¡®
+    #Ò¶×Ó½Úµã¸öÊı,ĞèÒªµÄÊÇ½ÚµãÏÂµÄ×ó½Úµã²ÅÕıÈ·
     def leaf_count(self, flag = 1):
         if self is None:
             return 0
@@ -229,7 +229,7 @@ class MultiTree:
         elif self.right is None and self.left is not None:
             return self.left.leaf_count(flag = 0)
         
-    #æ€»èŠ‚ç‚¹ä¸ªæ•°
+    #×Ü½Úµã¸öÊı
     def node_count(self):
         if self is None:
             return 0
@@ -243,7 +243,7 @@ class MultiTree:
             return 1 + self.left.node_count()
         #else:
             #return self.left.node_count()+ self.right.node_count()
-    #è·å–å½“å‰èŠ‚ç‚¹ä¸€çº§å­èŠ‚ç‚¹ä¸ªæ•°
+    #»ñÈ¡µ±Ç°½ÚµãÒ»¼¶×Ó½Úµã¸öÊı
     def son_count(self):
         self_tmp = self
         son_num = 0
@@ -258,7 +258,7 @@ class MultiTree:
                 self_tmp = self_tmp.right
                 son_num += 1
         return son_num    
-    #è·å–å½“å‰èŠ‚ç‚¹ä¸€çº§å­èŠ‚ç‚¹self
+    #»ñÈ¡µ±Ç°½ÚµãÒ»¼¶×Ó½Úµãself
     def son(self):
         self_tmp = self
         son_tmp = []
@@ -274,7 +274,7 @@ class MultiTree:
                 self_tmp = self_tmp.right
                 son_tmp.append(self_tmp)
         return son_tmp
-    # ä¸­åºéå†ï¼Œå¾—åˆ°ç”Ÿæˆæ ‘æ•°æ®
+    # ÖĞĞò±éÀú£¬µÃµ½Éú³ÉÊ÷Êı¾İ
     def inorder(self,data=[]):
         if self.left is not None:
             self.left.inorder(data)
@@ -315,12 +315,13 @@ def scoremat(TreeSeqFile:str,
             ScoreDictFile:str = '', 
             top:int = 0,
             pv:float = -1.,
-            mv:float = 2.,
+            mav:float = 2.,
+            miv:float = -1.,
             Alg:str = 'KM',
             Tqdm:int = 1,
-            merge:int = 0,
+            merge:float = 10,
             notebook:int = 0,
-            overlap:int = 0,
+            diff:int = 0,
             ):
     if Name2TypeFile != '':
         TreeSeqType = ReadTreeSeq_Name2Type(TreeSeqFile,Name2TypeFile)
@@ -343,7 +344,7 @@ def scoremat(TreeSeqFile:str,
 
     root1.CreatTree()
     root1.Postorder_Level()
-    lll = root1.nodes({}) #äºŒç»´è¡¨ç¤º
+    lll = root1.nodes({}) #¶şÎ¬±íÊ¾
     lllnode = [j for i in lll for j in i]
     lllnode_obj = [j.nodeobj for i in lll for j in i]
     # get root1 leaves' new label to celltype infos
@@ -351,7 +352,7 @@ def scoremat(TreeSeqFile:str,
 
     oroot1.CreatTree()
     oroot1.Postorder_Level()
-    olll = oroot1.nodes({}) #äºŒç»´è¡¨ç¤º
+    olll = oroot1.nodes({}) #¶şÎ¬±íÊ¾
     olllnode = [j for i in olll for j in i]
     oroot1_label2celltype = leafLable_to_celltype_info(olllnode)
 
@@ -364,7 +365,7 @@ def scoremat(TreeSeqFile:str,
 
     root2.CreatTree()
     root2.Postorder_Level()
-    llll = root2.nodes({}) #äºŒç»´è¡¨ç¤º
+    llll = root2.nodes({}) #¶şÎ¬±íÊ¾
     llllnode = [j for i in llll for j in i]
     llllnode_obj = [j.nodeobj for i in llll for j in i]
     # get root2 leaves' new label to celltype infos
@@ -372,7 +373,7 @@ def scoremat(TreeSeqFile:str,
 
     oroot2.CreatTree()
     oroot2.Postorder_Level()
-    ollll = oroot2.nodes({}) #äºŒç»´è¡¨ç¤º
+    ollll = oroot2.nodes({}) #¶şÎ¬±íÊ¾
     ollllnode = [j for i in ollll for j in i]
     oroot2_label2celltype = leafLable_to_celltype_info(ollllnode)
 
@@ -384,9 +385,9 @@ def scoremat(TreeSeqFile:str,
         lllldict[index] = [llllnode.index(i) for i in iter.son()]
 
     if ScoreDictFile == '': 
-        score_dict = Scoredict(root1.leaves([]),root2.leaves([]), mv)
+        score_dict = Scoredict(root1.leaves([]),root2.leaves([]), mav, miv)
     else:
-        score_dict = QuantitativeScoreFile(root1.leaves([]),root2.leaves([]),mv,ScoreDictFile)
+        score_dict = QuantitativeScoreFile(root1.leaves([]),root2.leaves([]),mav,miv,ScoreDictFile)
 
     mmatrix = pd.DataFrame([[0.0 for i in range(len(llllnode))] for j in range(len(lllnode))],
                         index=[i.label for i in lllnode],
@@ -407,7 +408,7 @@ def scoremat(TreeSeqFile:str,
         else:
             from tqdm import tqdm
         with tqdm(total=(root1.node_count()*root2.node_count()),desc='Matrix Node') as pbar:
-            #æ‰§è¡Œå¾ªæœ‰è§„å¾‹å°±æ˜¯(0,0)(0,1)(1,0)(1,1)(0,2)(2,0)(1,2)(2,1)(2,2)(0,3)(3,0)...(n,m)
+            #Ö´ĞĞÑ­ÓĞ¹æÂÉ¾ÍÊÇ(0,0)(0,1)(1,0)(1,1)(0,2)(2,0)(1,2)(2,1)(2,2)(0,3)(3,0)...(n,m)
             for loop_index in loopindex(root1.level+1,root2.level+1):
                 #print(loop_index)
                 for i in range(lllloop[loop_index[0]]):
@@ -526,7 +527,7 @@ def scoremat(TreeSeqFile:str,
                 leaves_list_tmp.remove(i)
         return leaves_list_tmp
     
-    if top == 0: #é»˜è®¤æƒ…å†µä¸‹
+    if top == 0: #Ä¬ÈÏÇé¿öÏÂ
         T1root_T2root = []
         
         mat_tmp = deepcopy(matrix_values)
@@ -602,7 +603,7 @@ def scoremat(TreeSeqFile:str,
                     percent = 0
                 else:
                     percent = (len(list(set(list_tmp1) - set(scorelist[-1]['Root1_match'])) + list(set(scorelist[-1]['Root1_match']) - set(list_tmp1))) / len(scorelist[-1]['Root1_match']))*100.
-                if round(percent) < overlap:
+                if round(percent) < diff:
                     #print(round(percent))
                     maxscore = np.max(mat_tmp)
                     del_i_index = np.where(mat_tmp==np.max(mat_tmp))[0][0]

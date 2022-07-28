@@ -367,11 +367,12 @@ class OP:
                 seq2_list_result, 
                 ScoreDictFile, 
                 poolnum=1, 
-                mv: float = 2., 
+                mav: float = 2., 
+                miv: float = -1., 
                 pv: float = -1., 
                 notebook:bool = False, 
                 Tqdm:bool = True,
-                merge:int = 0,
+                merge:float = 10,
                 ):
         # 直接调用 Manager 提供的 list() 和 dict()
         self.manager = mp.Manager
@@ -379,7 +380,8 @@ class OP:
         self.Seq1_list = seq1_list_result
         self.Seq2_list = seq2_list_result
         self.scoredictfile = ScoreDictFile
-        self.mv = mv
+        self.mav = mav
+        self.miv = miv
         self.pv = pv
         self.Tqdm = Tqdm
         self.notebook = notebook
@@ -415,9 +417,9 @@ class OP:
         score_dict = {}
         if scoredictfile == '':
             score_dict = Scoredict(root1_tmp.leaves(
-                []), root2_tmp.leaves([]), self.mv)
+                []), root2_tmp.leaves([]), self.mav, self.miv)
         else:
-            score_dict = QuantitativeScoreFile(scoredictfile)
+            score_dict = QuantitativeScoreFile(root1_tmp.leaves([]),root2_tmp.leaves([]),self.mav, self.miv,scoredictfile)
 
         mmatrix = pd.DataFrame([[0.0 for i in range(len(llllnode_tmp))] for j in range(len(lllnode_tmp))],
                                index=[i.nodeobj for i in lllnode_tmp],
@@ -493,11 +495,12 @@ def pvalue(times: int,
            topscorelist, 
            ScoreDictFile: str = '', 
            CPUs: int = 50, 
-           mv: float = 2., 
+           mav: float = 2., 
+           miv: float = -1.,
            pv: float = -1.,
            notebook: bool = False,
            Tqdm: bool = True,
-           merge:int = 0,
+           merge:float = 10,
            ):
     Seq1_list_result_max = []
     Seq2_list_result_max = []
@@ -509,7 +512,7 @@ def pvalue(times: int,
     #print(len(topscorelist))
     for i in range(len(topscorelist)):
         op_max = OP(
-            Seq1_list_result_max[i], Seq2_list_result_max[i], ScoreDictFile, CPUs, mv, pv, notebook, Tqdm, merge)
+            Seq1_list_result_max[i], Seq2_list_result_max[i], ScoreDictFile, CPUs, mav, miv, pv, notebook, Tqdm, merge)
         op_max.flow()
         score_list_max.append(op_max.mp_lst + [topscorelist[i]['Score']])
 

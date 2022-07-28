@@ -75,7 +75,7 @@ def GetMaxScore(trace,
                 prune=-1.,
                 dict_score={},
                 Algorithm:str = 'KM',
-                merge = 0
+                merge:float = 10
                 ):
     # 如果两棵树都是，即是根节点也是叶节点（单一元素），直接查字典，查不到就划归为罚分值prune
     root1node = root1
@@ -221,7 +221,10 @@ def GetMaxScore(trace,
                     trace[root1_index][root2_index].append([root1_index,j[1]])
                 #score = max(allmatrix[root1_index,j[1]] + prune*(r2leaf - j[0].leaf_count()), score)      
         
-        if merge != 0:
+        
+        if (abs(merge - (10)) < 1e-10):
+            pass
+        else:
             #print(root1.label, root1.node_count(), root2.label, root2.node_count())
             #print(root1.node_count() - root1.leaf_count() - 1, root2.node_count() - root2.leaf_count() - 1)
             #print(root1.nodeobj, root2.nodeobj)
@@ -250,7 +253,7 @@ def GetMaxScore(trace,
             
         
 
-            score_tmpp = ((root1.node_count() - root1.leaf_count() - 1) + (root2.node_count() - root2.leaf_count() - 1) + abs(root1.leaf_count() - root2.leaf_count())) * prune
+            score_tmpp = ((root1.node_count() - root1.leaf_count() - 1) + (root2.node_count() - root2.leaf_count() - 1) + abs(root1.leaf_count() - root2.leaf_count())) * merge
             #print(abs(root1.leaf_count() - root2.leaf_count()))
             for x in a:
                 score_tmpp += float(dict_score[x+'_'+x])

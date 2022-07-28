@@ -11,8 +11,9 @@ import random
 from multiprocessing import *
 import multiprocessing as mp
 import psutil
+import os
 
-parser = argparse.ArgumentParser(prog='MODELTA', description = ' Multi fork Development cell lineage tree alignment',epilog = 'Developer: Yang Lab(https://www.labxing.com/profile/10413), Details: https://github.com/Chenjy0212/modelta')
+parser = argparse.ArgumentParser(prog='mDELTA', description = ' Multifuricating Developmental cEll Lineage Tree Alignment',epilog = 'Developer: Yang Lab(https://www.labxing.com/profile/10413), Details: https://github.com/Chenjy0212/modelta')
 parser.add_argument('TreeSeqFile',type=str, help='[path/filename] Cell lineage tree file with branch length information removed.')
 parser.add_argument('TreeSeqFile2',type=str, help='[path/filename] Cell lineage tree file with branch length information removed.')
 parser.add_argument('-nt','--Name2TypeFile',type=str, default='', help='[path/filename] Convert tree node name to type.')
@@ -20,12 +21,17 @@ parser.add_argument('-nt2','--Name2TypeFile2',type=str, default='', help='[path/
 parser.add_argument('-sd','--ScoreDictFile',type=str, default='', help='[path/filename] Defines the score of matches between nodes.')
 parser.add_argument('-t','--top',type=int, default=0, help='[int > 0] Select the top few meaningful scores in the score matrix.')
 parser.add_argument('-m','--mv',type=float, default=2., help=' [float] The matching score between the same nodes.')
+#
 parser.add_argument('-p','--pv',type=float, default=-1., help=' [float] The prune score between the different nodes.')
 parser.add_argument('-T','--Tqdm',type=int, default=1, help=' [0(off) or 1(on)] Whether to display the operation progress bar.')
 parser.add_argument('-n','--notebook',type=int, default=0, help='[0(off) or 1(on)] Is it written and run in the jupyter notebook environment.')
 parser.add_argument('-P','--Pvalue',type=int, default=0, help='[int > 0] The number of times the original sequence needs to be disrupted.')
 parser.add_argument('-a','--Alg',type=str, default='KM', help='[KM / GA] Represent KM algorithm and GA algorithm respectively to find the maximum value of each node of the score matrix')
 parser.add_argument('-c','--CPUs',type=int, default=50, help='[int > 0] Multi process computing can greatly reduce the waiting time. The default process pool is 50, but limited by local computer resources, it can reach the maximum number of local CPU cores - 1.')
+parser.add_argument('-o','--output',type=str, default='KM', help='[path/filename] Output filename')
+parser.add_argument('-x','--overlap',type=float, default=0., help=' [float > 0] In the local results, the later comparison results cannot have X persent or more node pairs that duplicate the previous results.')
+#difference
+parser.add_argument('-mg','--merge',type=int, default=0, help='[0(off) or 1(on)] Decide whether to fuse intermediate nodes')
 
 args = parser.parse_args() #开始解析参数 --对于可选参数来说
 
@@ -42,6 +48,8 @@ notebook = args.notebook
 Alg = args.Alg
 times = args.Pvalue
 CPUs = args.CPUs
+overlap = args.overlap
+merge = args.merge
 
 class MultiTree:
     def __init__(self, nodeobj:str, level:'int'=0, label:str="root"):
@@ -131,23 +139,63 @@ class MultiTree:
         else:
             return 1 + max(self.left.height(), self.right.height())
     # 原来的多叉树的叶子节点
-    def leaves(self,ll=[]):
-        lll = ll
-        if self.nodeobj is None:
+    def leaves(self,ll=[],flag = 1): #意味 0 这个是叶子节点
+        if self is None:
             return None
-        elif self.left is None and self.right is None:
-            #print(self.nodeobj, end=' ')
-            lll.append(self)
-        elif self.left is None and self.right is not None:
-            #print(self.nodeobj, end=' ')
-            lll.append(self)
-            self.right.leaves(lll)
-        elif self.right is None and self.left is not None:
-            self.left.leaves(lll)
-        else:
-            self.left.leaves(lll)
-            self.right.leaves(lll)
-        return lll
+        if flag == 1:
+            if self.left is None:
+                ll.append(self)
+                return ll
+            else:
+                self = self.left
+        
+        if self.left is not None:
+            self.left.leaves(ll,flag = 0)
+        if self.nodeobj is not None:
+            if self.left is None:
+                ll.append(self)
+        if self.right is not None:
+            self.right.leaves(ll,flag = 0)
+        return ll
+        
+    def leaves_nodeobj(self,ll=[],flag = 1): #意味 0 这个是叶子节点
+        if self is None:
+            return None
+        if flag == 1:
+            if self.left is None:
+                ll.append(self.nodeobj)
+                return ll
+            else:
+                self = self.left
+        
+        if self.left is not None:
+            self.left.leaves_nodeobj(ll,flag = 0)
+        if self.nodeobj is not None:
+            if self.left is None:
+                ll.append(self.nodeobj)
+        if self.right is not None:
+            self.right.leaves_nodeobj(ll,flag = 0)
+        return ll
+    
+    def leaves_label(self,ll=[],flag = 1): #意味 0 这个是叶子节点
+        if self is None:
+            return None
+        if flag == 1:
+            if self.left is None:
+                ll.append(self.label)
+                return ll
+            else:
+                self = self.left
+        
+        if self.left is not None:
+            self.left.leaves_label(ll,flag = 0)
+        if self.nodeobj is not None:
+            if self.left is None:
+                ll.append(self.label)
+        if self.right is not None:
+            self.right.leaves_label(ll,flag = 0)
+        return ll
+   
     #生成树
     def CreatTree(self):
         if(self.nodeobj[0] == '('): #存在括号意味着还没达到叶子结点
@@ -207,24 +255,24 @@ class MultiTree:
         if self.nodeobj is not None:
             self.Level()
     #叶子节点个数,需要的是节点下的左节点才正确
-    def leaf_count(self,flag=1):
+    def leaf_count(self, flag = 1):
         if self is None:
             return 0
-        elif self.left is None and self.right is None:
-            return 1
         if flag == 1:
-            self = self.left
-        if self is None:
-            return 1
+            if self.left is None:
+                return 1
+            else:
+                self = self.left
         if self.left is None and self.right is None:
             return 1
+        elif self.right is not None and self.left is not None:
+            return self.left.leaf_count(flag = 0) + self.right.leaf_count(flag = 0)
         elif self.left is None and self.right is not None:
-            return 1 + self.right.leaf_count(0)
+            return 1 + self.right.leaf_count(flag = 0)
         elif self.right is None and self.left is not None:
-            return self.left.leaf_count(0)
-        else:
-            return self.left.leaf_count(0) + self.right.leaf_count(0)
-        
+            return self.left.leaf_count(flag = 0)
+
+          
     #总节点个数
     def node_count(self):
         if self is None:
@@ -238,7 +286,7 @@ class MultiTree:
         elif self.right is None and self.left is not None:
             return 1 + self.left.node_count()
         #else:
-            #return self.left.node_count()+ self.right.node_count()
+            #return self.left.node_count()+ self.right.node_count() + 1
     #获取当前节点一级子节点个数
     def son_count(self):
         self_tmp = self
@@ -280,6 +328,32 @@ class MultiTree:
             self.right.inorder(data)
         return data
 
+def label_leaves_list_to_tree(label_list, tree_str):
+    str_tmp = ''
+    flag = 0
+    for i in tree_str:
+        if i == '(':
+            str_tmp += i
+        elif i == ';':
+            str_tmp += i
+        elif i == ',':
+            if str_tmp[-1] == ')':
+                str_tmp += '|'
+            else:
+                str_tmp += label_list[flag]
+                str_tmp += '|'
+                flag +=1
+        elif i == ')':
+            if str_tmp[-1] == ')':
+                str_tmp += i
+            else:
+                str_tmp += label_list[flag]
+                str_tmp += i
+                flag +=1
+    return str_tmp
+            
+            
+
 def scoremat(TreeSeqFile:str, 
             TreeSeqFile2:str, 
             Name2TypeFile:str = '',
@@ -290,7 +364,9 @@ def scoremat(TreeSeqFile:str,
             mv:float = 2.,
             Alg:str = 'KM',
             Tqdm:int = 1,
-            notebook:int = 0):
+            notebook:int = 0,
+            overlap:int = 0,
+            merge:int = 0):
     if Name2TypeFile != '':
         TreeSeqType = ReadTreeSeq_Name2Type(TreeSeqFile,Name2TypeFile)
         TreeSeqOri = ReadTreeSeq(TreeSeqFile)
@@ -313,12 +389,21 @@ def scoremat(TreeSeqFile:str,
     root1.CreatTree()
     root1.Postorder_Level()
     lll = root1.nodes({}) #二维表示
+    #for i in lll[0]:
+        #print(i.label)
     lllnode = [j for i in lll for j in i]
+    lllnode_obj = [j.nodeobj for i in lll for j in i]
+    #print(lllnode_obj)
+    
+    # get root1 leaves' new label to celltype infos
+    root1_label2celltype = leafLable_to_celltype_info(lllnode)
 
     oroot1.CreatTree()
     oroot1.Postorder_Level()
     olll = oroot1.nodes({}) #二维表示
     olllnode = [j for i in olll for j in i]
+    # get orignal root1 leaves' new label to celltype infos
+    oroot1_label2celltype = leafLable_to_celltype_info(olllnode)
 
     lllloop = []
     for i in lll:
@@ -331,11 +416,18 @@ def scoremat(TreeSeqFile:str,
     root2.Postorder_Level()
     llll = root2.nodes({}) #二维表示
     llllnode = [j for i in llll for j in i]
+    llllnode_obj = [j.nodeobj for i in llll for j in i]
+    #print(llllnode_obj)
+    
+    # get root2 leaves' new label to celltype infos
+    root2_label2celltype = leafLable_to_celltype_info(llllnode)
 
     oroot2.CreatTree()
     oroot2.Postorder_Level()
     ollll = oroot2.nodes({}) #二维表示
     ollllnode = [j for i in ollll for j in i]
+    # get orignal root2 leaves' new label to celltype infos
+    oroot2_label2celltype = leafLable_to_celltype_info(ollllnode)
 
     llllloop = []
     for i in llll:
@@ -346,12 +438,18 @@ def scoremat(TreeSeqFile:str,
 
     if ScoreDictFile == '': 
         score_dict = Scoredict(root1.leaves([]),root2.leaves([]), mv)
+        #print(root2.leaves([]))
     else:
-        score_dict = QuantitativeScoreFile(ScoreDictFile)
+        score_dict = QuantitativeScoreFile(root1.leaves([]),root2.leaves([]),mv,ScoreDictFile)
 
+    #print(root1.left.leaves_nodeobj([]),root2.left.leaves_nodeobj([]))
+    #print(root1.left.leaf_count(),root2.left.leaf_count())
+    #print(root1.leaves_nodeobj([]),root2.leaves_nodeobj([]))
+    #print(score_dict)
     mmatrix = pd.DataFrame([[0.0 for i in range(len(llllnode))] for j in range(len(lllnode))],
                         index=[i.label for i in lllnode],
                         columns=[j.label for j in llllnode])
+
     mmatrix.index.name = 'Root1' 
     mmatrix.columns.name = 'Root2'
     matrix_values = mmatrix.values
@@ -395,8 +493,13 @@ def scoremat(TreeSeqFile:str,
                                                                         local_matrix_root2_index = lllldict[j_index], 
                                                                         dict_score=score_dict,
                                                                         Algorithm=Alg,
-                                                                        prune=pv,)
+                                                                        prune=pv,
+                                                                        lll_label = [i.label for i in lll[0]],
+                                                                        llll_label = [i.label for i in llll[0]],
+                                                                        merge = merge,)
                         pbar.update(1)
+        #print(ttrace)
+        #print(llldict, lllldict)
     else:
         for loop_index in loopindex(root1.level+1,root2.level+1):
                 #print(loop_index)
@@ -424,59 +527,203 @@ def scoremat(TreeSeqFile:str,
                                                                         local_matrix_root2_index = lllldict[j_index], 
                                                                         dict_score=score_dict,
                                                                         Algorithm=Alg,
-                                                                        prune=pv,)
-    
-    if top == 0: #默认情况下
-        T1root_T2root = []
-        T1root_T2root.append({'Score':matrix_values[-1][-1],
-                            'Root1_label':root1.label, 
-                            'Root1_node':root1.nodeobj,
-                            'Root1_seq':oroot1.nodeobj,
-                            'Root2_label':root2.label, 
-                            'Root2_node':root2.nodeobj, 
-                            'Root2_seq':oroot2.nodeobj, 
-                            'row':root1.node_count()-1, 
-                            'col':root2.node_count()-1})
-
-        return({'matrix':mmatrix, 'T1root_T2root':T1root_T2root})
-    elif top > 0 and top < min(root1.node_count(), root2.node_count()):
-
-        def changemat(rac, tracemat, mat):
-            for i in tracemat[tuple(rac)]:
+                                                                        prune=pv,
+                                                                        lll_label = [i.label for i in lll[0]],
+                                                                        llll_label = [i.label for i in llll[0]],
+                                                                        merge = merge,)
+        #print(ttrace)
+        print(llldict)
+        
+    def changemat(rac, tracemat, tracemat_value, mat, list_tmp1, list_tmp2):
+        for i in tracemat_value[tuple(rac)]:
+            if isinstance(i[0],int) and isinstance(i[1],int):
+                list_tmp1.append(tracemat.index[i[0]])
+                list_tmp2.append(tracemat.columns[i[1]])
+            elif not isinstance(i[0],int) and not isinstance(i[1],int):    
+                list_tmp1.append(tracemat.index[rac[0]])
+                list_tmp2.append(tracemat.columns[rac[1]])
+                return
+                
+            #print(i[0],i[0])
+        for i in tracemat_value[tuple(rac)]:
+            if isinstance(i[0],int) and isinstance(i[1],int):
                 #print(i[0],root1.leaf_count(), i[1],root2.leaf_count())
                 if i == [] or (i[0]<root1.leaf_count() and i[1] <root2.leaf_count()):
                     mat[tuple(i)] = -99999.
                 else:
                     mat[tuple(i)] = -99999.
                     #print(i)
-                    changemat(i,tracemat,mat)
-            return mat
+                    changemat(i, tracemat,tracemat_value, mat, list_tmp1, list_tmp2)
+        #return mat
+        
+    def getmatchtree(rac, lllnode_obj, llllnode_obj, tracemat_value, mat, tree_tmp1, tree_tmp2):
+        #print(tuple(rac))
+        #print(lllnode_obj)
+        #print(llllnode_obj)
+        for i in tracemat_value[tuple(rac)]:
+            #print(i)
+            if isinstance(i[0],int) and isinstance(i[1],int):
+                if i[0]<root1.leaf_count() and i[1] <root2.leaf_count():
+                    mat[tuple(i)] = -99999.
+                    if tree_tmp1[-1] == '(': #if tree_tmp2[-1] == '(':
+                        tree_tmp1.append(str(lllnode_obj[i[0]]))
+                        tree_tmp2.append(str(llllnode_obj[i[1]]))
+                    else:
+                        tree_tmp1.append(','+str(lllnode_obj[i[0]]))
+                        tree_tmp2.append(','+str(llllnode_obj[i[1]]))
+                else:
+                    mat[tuple(i)] = -99999.
+                    if tree_tmp1[-1] == '(':
+                        tree_tmp1.append('(')
+                        tree_tmp2.append('(')
+                    else:
+                        tree_tmp1.append(',')
+                        tree_tmp1.append('(')
+                        tree_tmp2.append(',')
+                        tree_tmp2.append('(')
+                    getmatchtree(i, lllnode_obj, llllnode_obj, tracemat_value, mat, tree_tmp1, tree_tmp2)
+                    tree_tmp1.append(')')
+                    tree_tmp2.append(')')
+            else:
+                tree_tmp1.append(lllnode_obj[rac[0]])
+                tree_tmp2.append(llllnode_obj[rac[1]])
+        print(tree_tmp1)   
+        print(tree_tmp2)
+           
+    def where_prune(match_list:list, leaves_list:list):
+        leaves_list_tmp = deepcopy(leaves_list)
+         #print(leaves_list_tmp)
+        for i in leaves_list:
+            if i in match_list:
+                leaves_list_tmp.remove(i)
+        return leaves_list_tmp
+    
+    if top == 0: #默认情况下
+        T1root_T2root = []
+        
+        mat_tmp = deepcopy(matrix_values)
+        list_tmp1 = []
+        list_tmp2 = []
+        mat_tmp[-1,-1] = -99999.
+        changemat([-1,-1],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
+        
+        mat_tmp2 = deepcopy(matrix_values)
+        tree_tmp1 = ['(']
+        tree_tmp2 = ['(']
+        mat_tmp2[-1,-1] = -99999.
+        getmatchtree([-1,-1],lllnode_obj, llllnode_obj, trace_value,mat_tmp2, tree_tmp1, tree_tmp2)
+        tree_tmp1.append(');')
+        tree_tmp2.append(');')
+        
+        #list_tmp1.insert(0,root1.label)
+        #list_tmp2.insert(0,root2.label)
+        T1root_T2root.append({'Score':matrix_values[-1][-1],
+                            'Root1_label':root1.label, 
+                            'Root1_node':root1.nodeobj,
+                            'Root1_seq':oroot1.nodeobj,
+                            'Root1_label_node': label_leaves_list_to_tree(root1.leaves_label([]), root1.nodeobj),
+                            'Root2_label':root2.label, 
+                            'Root2_node':root2.nodeobj, 
+                            'Root2_seq':oroot2.nodeobj,
+                            'Root2_label_node': label_leaves_list_to_tree(root2.leaves_label([]), root2.nodeobj),
+                            'Root1_match': list_tmp1,
+                            'Root2_match': list_tmp2,
+                            'Root1_match_tree': ''.join(tree_tmp1),
+                            'Root2_match_tree': ''.join(tree_tmp2),
+                            'Root1_prune':where_prune(list_tmp1, list(map(lambda x:x.label,root1.leaves([])))),
+                            'Root2_prune':where_prune(list_tmp2, list(map(lambda x:x.label,root2.leaves([])))),
+                            'row':root1.node_count()-1, 
+                            'col':root2.node_count()-1})
+
+        return({'matrix':mmatrix, 
+                'tree1_leaves_nodename': oroot1_label2celltype[1],
+                'tree1_leaves_label': root1_label2celltype[0],
+                'tree1_leaves_celltype': root1_label2celltype[1],
+                'tree2_leaves_nodename': oroot1_label2celltype[1],
+                'tree2_leaves_label': root2_label2celltype[0],
+                'tree2_leaves_celltype': root2_label2celltype[1],
+                'score_dict':score_dict,
+                'T1root_T2root':T1root_T2root})
+        
+    elif top > 0 and top < min(root1.node_count(), root2.node_count()):
 
         mat_tmp = deepcopy(matrix_values)
+        mat_tmp2 = deepcopy(matrix_values)
         scorelist=[]
-        for _ in range(top):
+        for jjj in range(top):
             #print(mat_tmp)
-            maxscore = np.max(mat_tmp),
+            maxscore = np.max(mat_tmp)
             del_i_index = np.where(mat_tmp==np.max(mat_tmp))[0][0]
             del_j_index = np.where(mat_tmp==np.max(mat_tmp))[1][0]
-            #scorelist.append([np.max(mat_tmp),mat.index[del_i_index],mat.columns[del_j_index]])
-            #scorelist.append([np.max(mat_tmp), del_i_index, del_j_index])
-            scorelist.append({'Score':maxscore[0], 
+            
+            list_tmp1 = []
+            list_tmp2 = []
+            tree_tmp1 = ['(']
+            tree_tmp2 = ['(']
+            mat_tmp[del_i_index,del_j_index] = -99999.
+            mat_tmp2[del_i_index,del_j_index] = -99999.
+            changemat([del_i_index,del_j_index],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
+            getmatchtree([del_i_index,del_j_index],lllnode_obj, llllnode_obj, trace_value,mat_tmp2, tree_tmp1, tree_tmp2)
+            
+            #if list_tmp1[0] != lllnode[del_i_index].label:
+            #    list_tmp1.insert(0,lllnode[del_i_index].label)
+            #if list_tmp2[0] != llllnode[del_j_index].label:    
+            #    list_tmp2.insert(0,llllnode[del_j_index].label)
+            if jjj > 0:
+                if len(scorelist[-1]['Root1_match']) == 0:
+                    percent = 0
+                else:
+                    percent = (len(list(set(list_tmp1) - set(scorelist[-1]['Root1_match'])) + list(set(scorelist[-1]['Root1_match']) - set(list_tmp1))) / len(scorelist[-1]['Root1_match']))*100.
+                if round(percent) < overlap:
+                    #print(round(percent))
+                    maxscore = np.max(mat_tmp)
+                    del_i_index = np.where(mat_tmp==np.max(mat_tmp))[0][0]
+                    del_j_index = np.where(mat_tmp==np.max(mat_tmp))[1][0]
+                    
+                    list_tmp1 = []
+                    list_tmp2 = []
+                    mat_tmp[del_i_index,del_j_index] = -99999.
+                    changemat([del_i_index,del_j_index],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
+                    getmatchtree([del_i_index,del_j_index],lllnode_obj, llllnode_obj, trace_value,mat_tmp2, tree_tmp1, tree_tmp2)
+                    
+            tree_tmp1.append(');')
+            tree_tmp2.append(');')     
+                
+            scorelist.append({'Score':maxscore,
                             'Root1_label':lllnode[del_i_index].label, 
                             'Root1_node':lllnode[del_i_index].nodeobj,
                             'Root1_seq':olllnode[del_i_index].nodeobj,
+                            'Root1_label_node': label_leaves_list_to_tree(lllnode[del_i_index].leaves_label([]), lllnode[del_i_index].nodeobj),
                             'Root2_label':llllnode[del_j_index].label, 
                             'Root2_node':llllnode[del_j_index].nodeobj, 
-                            'Root2_seq':ollllnode[del_j_index].nodeobj,
+                            'Root2_seq':ollllnode[del_j_index].nodeobj, 
+                            'Root2_label_node': label_leaves_list_to_tree(llllnode[del_j_index].leaves_label([]), llllnode[del_j_index].nodeobj),
+                            'Root1_match': list_tmp1,
+                            'Root2_match': list_tmp2,
+                            'Root1_match_tree': ''.join(tree_tmp1),
+                            'Root2_match_tree': ''.join(tree_tmp2),
+                            'Root1_prune':where_prune(list_tmp1, list(map(lambda x:x.label,lllnode[del_i_index].leaves([])))),
+                            'Root2_prune':where_prune(list_tmp2, list(map(lambda x:x.label,llllnode[del_j_index].leaves([])))),
                             'row':del_i_index, 
                             'col':del_j_index})
 
-            #trace_value[del_i_index, del_j_index]
-            mat_tmp[del_i_index,del_j_index] = -99999.
-            mat_tmp = changemat([del_i_index,del_j_index],trace_value,mat_tmp)
+            
 
-
-        return({'matrix':mmatrix, 'TopScoreList':scorelist})
+        #print(ttrace)
+        #print(mat_tmp)
+        #print(overlap)
+        #print(root1.node_count()*root2.node_count())
+        return({'matrix':mmatrix, 
+                'tree1_leaves_nodename': oroot1_label2celltype[1],
+                'tree1_leaves_label': root1_label2celltype[0],
+                'tree1_leaves_celltype': root1_label2celltype[1],
+                'tree2_leaves_nodename': oroot1_label2celltype[1],
+                'tree2_leaves_label': root2_label2celltype[0],
+                'tree2_leaves_celltype': root2_label2celltype[1],
+                'score_dict':score_dict,
+                'TopScoreList':scorelist})
+        
+        
 
     else:
         print("Parameter top cannot be negative, or it might be out of range.")
@@ -542,7 +789,16 @@ def FindNode(Seq: str, times: int) -> list:
 
 
 class OP:
-    def __init__(self, seq1_list_result, seq2_list_result, ScoreDictFile, poolnum=1, mv: float = 2., pv: float = -1., notebook:int = 0, Tqdm:int = 1):
+    def __init__(self, 
+                seq1_list_result, 
+                seq2_list_result, 
+                ScoreDictFile, 
+                poolnum=1, 
+                mv: float = 2., 
+                pv: float = -1., 
+                notebook:int = 0, 
+                Tqdm:int = 1,
+                merge:int = 0,):
         # 直接调用 Manager 提供的 list() 和 dict()
         self.manager = mp.Manager
         self.mp_lst = self.manager().list()
@@ -555,6 +811,7 @@ class OP:
         self.Tqdm = notebook
         self.poolnum = min(poolnum, max(psutil.cpu_count(False), 1))
         self.length = len(seq1_list_result)
+        self.merge = merge
 
     def Foo(self, i, j, scoredictfile):
         root1_tmp = MultiTree(i)
@@ -583,10 +840,9 @@ class OP:
 
         score_dict = {}
         if scoredictfile == '':
-            score_dict = Scoredict(root1_tmp.leaves(
-                []), root2_tmp.leaves([]), self.mv)
+            score_dict = Scoredict(root1_tmp.leaves([]), root2_tmp.leaves([]), self.mv)
         else:
-            score_dict = QuantitativeScoreFile(scoredictfile)
+            score_dict = QuantitativeScoreFile(root1_tmp.leaves([]), root2_tmp.leaves([]), self.mv, ScoreDictFile)
 
         mmatrix = pd.DataFrame([[0.0 for i in range(len(llllnode_tmp))] for j in range(len(lllnode_tmp))],
                                index=[i.nodeobj for i in lllnode_tmp],
@@ -628,7 +884,10 @@ class OP:
                                                                   local_matrix_root2_index=lllldict_tmp[j_index],
                                                                   dict_score=score_dict,
                                                                   prune=self.pv,
-                                                                  Algorithm='')
+                                                                  Algorithm='',
+                                                                  lll_label = [i.label for i in lll[0]],
+                                                                  llll_label = [i.label for i in llll[0]],
+                                                                  merge = self.merge)
         # print(mmatrix)
         # print(ttrace)
         # print(matrix_values[len(lllnode)-1][len(llllnode)-1])
@@ -663,6 +922,7 @@ def pvalue(times: int,
            pv: float = -1.,
            notebook: int = 0,
            Tqdm: int = 1,
+           merge:int = 0,
            ):
     Seq1_list_result_max = []
     Seq2_list_result_max = []
@@ -674,7 +934,7 @@ def pvalue(times: int,
     #print(len(topscorelist))
     for i in range(len(topscorelist)):
         op_max = OP(
-            Seq1_list_result_max[i], Seq2_list_result_max[i], ScoreDictFile, CPUs, mv, pv, notebook, Tqdm)
+            Seq1_list_result_max[i], Seq2_list_result_max[i], ScoreDictFile, CPUs, mv, pv, notebook, Tqdm, merge)
         op_max.flow()
         score_list_max.append(op_max.mp_lst + [topscorelist[i]['Score']])
 
@@ -692,19 +952,36 @@ if __name__ == '__main__':
                          top = top,
                          notebook = notebook,
                          pv = pv,
-                         Tqdm = Tqdm) 
+                         Tqdm = Tqdm,
+                         overlap = overlap,
+                         merge = merge) 
     print("\n********** Score Matrix **********\n", example['matrix'])
              
     if top == 0:
         print("\n********** T1root_T2root **********")
         for key,value in example['T1root_T2root'][0].items():
             print('{key}:{value}'.format(key = key, value = value))
+        print("\n********** tree1_leaves_nodename **********\n", example['tree1_leaves_nodename']) 
+        print("\n********** tree1_leaves_label **********\n", example['tree1_leaves_label']) 
+        print("\n********** tree1_leaves_celltype **********\n", example['tree1_leaves_celltype']) 
+        print("\n********** tree2_leaves_nodename **********\n", example['tree2_leaves_nodename']) 
+        print("\n********** tree2_leaves_label **********\n", example['tree2_leaves_label']) 
+        print("\n********** tree2_leaves_celltype **********\n", example['tree2_leaves_celltype'])         
+        print("\n********** score_dict **********\n", example['score_dict'])         
 
     elif top > 0:
         for index,keyss in enumerate(example['TopScoreList']):
             print('\n********** Top ', index+1, '**********')
             for key,value in keyss.items():
                 print('{key}:{value}'.format(key = key, value = value))
+        
+        print("\n********** tree1_leaves_nodename **********\n", example['tree1_leaves_nodename']) 
+        print("\n********** tree1_leaves_label **********\n", example['tree1_leaves_label']) 
+        print("\n********** tree1_leaves_celltype **********\n", example['tree1_leaves_celltype']) 
+        print("\n********** tree2_leaves_nodename **********\n", example['tree2_leaves_nodename']) 
+        print("\n********** tree2_leaves_label **********\n", example['tree2_leaves_label']) 
+        print("\n********** tree2_leaves_celltype **********\n", example['tree2_leaves_celltype'])         
+        print("\n********** score_dict **********\n", example['score_dict'])                
                 
 
     if times > 0:
