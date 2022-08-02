@@ -1,22 +1,3 @@
-Metadata-Version: 2.1
-Name: modelta
-Version: 1.0.30
-Summary: Chen and Yang Lab Multi fork Development cell lineage tree alignment 
-Home-page: https://github.com/Chenjy0212/modelta
-Author: EeWhile(Jingyu Chen)
-Author-email: 1026224216@qq.com
-License: MIT
-Classifier: License :: OSI Approved :: MIT License
-Classifier: Programming Language :: Python
-Classifier: Programming Language :: Python :: 3
-Classifier: Programming Language :: Python :: 3.6
-Classifier: Programming Language :: Python :: Implementation :: CPython
-Classifier: Programming Language :: Python :: Implementation :: PyPy
-Requires-Python: >=3.6.0
-Description-Content-Type: text/markdown
-License-File: LICENSE
-
-
 # mDELTA
 
 <div align=center><img alt="logo" src="./image/mDELTAt.png" width=70% style="float:right; padding:40px"/></div>
@@ -418,13 +399,9 @@ optional arguments:
                         CPU cores - 1.
   -o OUTPUT, --output OUTPUT
                         [path/filename] Output filename
-  -x DIFF, --diff DIFF  [int > 0] Alignment must consist of a minimal of DIFF{'option_strings': ['-x', '--diff'], 'dest': 'diff',
-                        'nargs': None, 'const': None, 'default': 0, 'type': 'int', 'choices': None, 'required': False, 'help': '
-                        [int > 0] Alignment must consist of a minimal of DIFF% aligned cell pairs that are different from
-                        previous(better) local alignments in order to be considered as another new alignment (e.g. `-x 20` means
-                        20 persent).', 'metavar': None, 'container': <argparse._ArgumentGroup object at 0x0000024B6EEA3E80>,
-                        'prog': 'mDELTA'}ligned cell pairs that are different from previous(better) local alignments in order to
-                        be considered as another new alignment (e.g. `-x 20` means 20 persent).
+  -x DIFF, --diff DIFF  [int > 0] Alignment must consist of a minimal 
+                        of DIFF% aligned cell pairs that are different from previous(better) local
+                        alignments in order to be considered as another new alignment (e.g. `-x 20` means 20%).
   -mg MERGE, --merge MERGE
                         [float] This is the scaling factor for calculating the score of merging an internal node (e.g. -mg -1),
                         which is multiplied by the number of tips of the internal node to be merged. Default to 0.

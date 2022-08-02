@@ -13,25 +13,24 @@ import multiprocessing as mp
 import psutil
 import os
 
-parser = argparse.ArgumentParser(prog='mDELTA', description = ' Multifuricating Developmental cEll Lineage Tree Alignment',epilog = 'Developer: Yang Lab(https://www.labxing.com/profile/10413), Details: https://github.com/Chenjy0212/modelta')
-parser.add_argument('TreeSeqFile',type=str, help='[path/filename] Cell lineage tree file with branch length information removed.')
-parser.add_argument('TreeSeqFile2',type=str, help='[path/filename] Cell lineage tree file with branch length information removed.')
-parser.add_argument('-nt','--Name2TypeFile',type=str, default='', help='[path/filename] Convert tree node name to type.')
-parser.add_argument('-nt2','--Name2TypeFile2',type=str, default='', help='[path/filename] Convert tree node name to type.')
-parser.add_argument('-sd','--ScoreDictFile',type=str, default='', help='[path/filename] Defines the score of matches between nodes.')
-parser.add_argument('-t','--top',type=int, default=0, help='[int > 0] Select the top few meaningful scores in the score matrix.')
-parser.add_argument('-m','--mv',type=float, default=2., help=' [float] The matching score between the same nodes.')
-#
-parser.add_argument('-p','--pv',type=float, default=-1., help=' [float] The prune score between the different nodes.')
-parser.add_argument('-T','--Tqdm',type=int, default=1, help=' [0(off) or 1(on)] Whether to display the operation progress bar.')
-parser.add_argument('-n','--notebook',type=int, default=0, help='[0(off) or 1(on)] Is it written and run in the jupyter notebook environment.')
-parser.add_argument('-P','--Pvalue',type=int, default=0, help='[int > 0] The number of times the original sequence needs to be disrupted.')
-parser.add_argument('-a','--Alg',type=str, default='KM', help='[KM / GA] Represent KM algorithm and GA algorithm respectively to find the maximum value of each node of the score matrix')
-parser.add_argument('-c','--CPUs',type=int, default=50, help='[int > 0] Multi process computing can greatly reduce the waiting time. The default process pool is 50, but limited by local computer resources, it can reach the maximum number of local CPU cores - 1.')
+parser = argparse.ArgumentParser(prog='mDELTA', description = ' Multifuricating Developmental cEll Lineage Tree Alignment(mDELTA) ',epilog = 'More details on https://github.com/Chenjy0212/modelta')
+parser.add_argument('TreeSeqFile',type=str, help='[path/filename] A text file storing cell lineage tree #1 in newick format. Tips can be labeled by name or cell type. Branch lengths should be removed.')
+parser.add_argument('TreeSeqFile2',type=str, help='[path/filename] A text file storing cell lineage tree #2 in newick format. Tips can be labeled by name or cell type. Branch lengths should be removed.')
+parser.add_argument('-nt','--Name2TypeFile',type=str, default='', help='[path/filename] List of correspondance between tip name and cell type for cell lineage tree #1.')
+parser.add_argument('-nt2','--Name2TypeFile2',type=str, default='', help='[path/filename] List of correspondance between tip name and cell type for cell lineage tree #2.')
+parser.add_argument('-sd','--ScoreDictFile',type=str, default='', help='[path/filename] A comma-delimited text file used to determine similarity scores between cells. If there are exactly three columns, they will be interpreted as (1) the cell (name or type) in Tree #1, (2) the cell in Tree #2, and (3) the similarity score. If otherwise, the first column will be interpreted as the cell (name or type) and the remaining columns as features of the cell (e.g. expression of a gene). The similarity scores will be estimated between all pairs of cells based on the Euclidean distance calculated using all the features. Overrides `-ma` and `-mi`.')
+parser.add_argument('-t','--top',type=int, default=0, help='[int > 0] Performs local (instead of global) alignment, and output the top NUM local alignments with the highest score (e.g. `-t 10`). In the case of global alignment, this parameter should be omitted.')
+parser.add_argument('-ma','--mav',type=float, default=2., help=' [float] Default=2.')
+parser.add_argument('-mi','--miv',type=float, default=-1., help=' [float] Default=-1. Shorthand for a simple matching score scheme, where the matching score between a pair of the same cell types is MAV and all other pairs are MIV. (e.g. `-ma 2 -mi -2`). Overridden by `-sd`.')
+parser.add_argument('-p','--pv',type=float, default=-1., help=' [float] The score for pruning a tip of the tree (e.g. `-p -2`). Default to -1.')
+parser.add_argument('-T','--Tqdm',type=int, default=1, help=' [0(off) or 1(on)] Toggle for the jupyter notebook environment.')
+parser.add_argument('-n','--notebook',type=int, default=0, help='[0(off) or 1(on)] Toggle for the jupyter notebook environment.')
+parser.add_argument('-P','--PERM',type=int, default=0, help='[int > 0] Toggle for the statistical significance. For each observed alignment, the aligned trees will be permuted PERM times to generate a null distribution of alignment scores, with which a P value can be calculated for the observed alignment score.')
+parser.add_argument('-a','--Alg',type=str, default='KM', help='[KM / GA] Use Kuhn-Munkres or Greedy Algorithm to find the optimal alignment score.')
+parser.add_argument('-c','--CPUs',type=int, default=50, help='[int > 0] Number of threads for multi-processing. Default to 50., it can reach the maximum number of local CPU cores - 1.')
 parser.add_argument('-o','--output',type=str, default='KM', help='[path/filename] Output filename')
-parser.add_argument('-x','--overlap',type=float, default=0., help=' [float > 0] In the local results, the later comparison results cannot have X persent or more node pairs that duplicate the previous results.')
-#difference
-parser.add_argument('-mg','--merge',type=int, default=0, help='[0(off) or 1(on)] Decide whether to fuse intermediate nodes')
+parser.add_argument('-x','--diff',type=int, default=0, help=' [int > 0] Alignment must consist of a minimal of DIFF% aligned cell pairs that are different from previous(better) local alignments in order to be considered as another new alignment (e.g. `-x 20` means 20 persent).')
+parser.add_argument('-mg','--merge',type=float, default=10, help='[float] This is the scaling factor for calculating the score of merging an internal node (e.g. -mg -1), which is multiplied by the number of tips of the internal node to be merged. Default to 0.')
 
 args = parser.parse_args() #开始解析参数 --对于可选参数来说
 
@@ -42,13 +41,14 @@ Name2TypeFile2 = args.Name2TypeFile2
 ScoreDictFile = args.ScoreDictFile
 top = args.top
 pv = args.pv
-mv = args.mv
+mav = args.mav
+miv = args.miv
 Tqdm = args.Tqdm
 notebook = args.notebook
 Alg = args.Alg
-times = args.Pvalue
+times = args.PERM
 CPUs = args.CPUs
-overlap = args.overlap
+diff = args.diff
 merge = args.merge
 
 class MultiTree:
@@ -224,12 +224,12 @@ class MultiTree:
                 #第一个子节点都是父节点的左节点
                 #后续子节点就是上一个子节点的右节点 
                 #赋予label
-                    label = str(index) if self.label == 'root' else self_tmp.label+','+str(index)    
+                    label = str(index) if self.label == 'root' else self_tmp.label+'_'+str(index)    
                     self.left = MultiTree(item,label=label)
                     self = self.left
                     self.CreatTree()
                 else:
-                    label = str(index) if not ',' in self.label else self_tmp.label+','+str(index)    
+                    label = str(index) if not '_' in self.label else self_tmp.label+'_'+str(index)    
                     self.right = MultiTree(item,label=label)
                     self = self.right
                     self.CreatTree()
@@ -338,10 +338,10 @@ def label_leaves_list_to_tree(label_list, tree_str):
             str_tmp += i
         elif i == ',':
             if str_tmp[-1] == ')':
-                str_tmp += '|'
+                str_tmp += ','
             else:
                 str_tmp += label_list[flag]
-                str_tmp += '|'
+                str_tmp += ','
                 flag +=1
         elif i == ')':
             if str_tmp[-1] == ')':
@@ -361,12 +361,13 @@ def scoremat(TreeSeqFile:str,
             ScoreDictFile:str = '', 
             top:int = 0,
             pv:float = -1.,
-            mv:float = 2.,
+            mav:float = 2.,
+            miv:float = -1.,
             Alg:str = 'KM',
             Tqdm:int = 1,
             notebook:int = 0,
-            overlap:int = 0,
-            merge:int = 0):
+            diff:int = 0,
+            merge:float = 10.):
     if Name2TypeFile != '':
         TreeSeqType = ReadTreeSeq_Name2Type(TreeSeqFile,Name2TypeFile)
         TreeSeqOri = ReadTreeSeq(TreeSeqFile)
@@ -393,6 +394,7 @@ def scoremat(TreeSeqFile:str,
         #print(i.label)
     lllnode = [j for i in lll for j in i]
     lllnode_obj = [j.nodeobj for i in lll for j in i]
+    lllnode_label = [j.label for i in lll for j in i]
     #print(lllnode_obj)
     
     # get root1 leaves' new label to celltype infos
@@ -417,6 +419,7 @@ def scoremat(TreeSeqFile:str,
     llll = root2.nodes({}) #二维表示
     llllnode = [j for i in llll for j in i]
     llllnode_obj = [j.nodeobj for i in llll for j in i]
+    llllnode_label = [j.label for i in llll for j in i]
     #print(llllnode_obj)
     
     # get root2 leaves' new label to celltype infos
@@ -437,10 +440,10 @@ def scoremat(TreeSeqFile:str,
         lllldict[index] = [llllnode.index(i) for i in iter.son()]
 
     if ScoreDictFile == '': 
-        score_dict = Scoredict(root1.leaves([]),root2.leaves([]), mv)
+        score_dict = Scoredict(root1.leaves([]),root2.leaves([]), mav, miv)
         #print(root2.leaves([]))
     else:
-        score_dict = QuantitativeScoreFile(root1.leaves([]),root2.leaves([]),mv,ScoreDictFile)
+        score_dict = QuantitativeScoreFile(root1.leaves([]),root2.leaves([]),mav, miv, ScoreDictFile)
 
     #print(root1.left.leaves_nodeobj([]),root2.left.leaves_nodeobj([]))
     #print(root1.left.leaf_count(),root2.left.leaf_count())
@@ -587,8 +590,8 @@ def scoremat(TreeSeqFile:str,
             else:
                 tree_tmp1.append(lllnode_obj[rac[0]])
                 tree_tmp2.append(llllnode_obj[rac[1]])
-        print(tree_tmp1)   
-        print(tree_tmp2)
+        #print(tree_tmp1)   
+        #print(tree_tmp2)
            
     def where_prune(match_list:list, leaves_list:list):
         leaves_list_tmp = deepcopy(leaves_list)
@@ -615,21 +618,31 @@ def scoremat(TreeSeqFile:str,
         tree_tmp1.append(');')
         tree_tmp2.append(');')
         
+        mat_tmp3 = deepcopy(matrix_values)
+        tree_tmp3 = ['(']
+        tree_tmp4 = ['(']
+        mat_tmp3[-1,-1] = -99999.
+        getmatchtree([-1,-1],lllnode_label, llllnode_label, trace_value,mat_tmp3, tree_tmp3, tree_tmp4)
+        tree_tmp3.append(');')
+        tree_tmp4.append(');')
+        
         #list_tmp1.insert(0,root1.label)
         #list_tmp2.insert(0,root2.label)
         T1root_T2root.append({'Score':matrix_values[-1][-1],
-                            'Root1_label':root1.label, 
-                            'Root1_node':root1.nodeobj,
-                            'Root1_seq':oroot1.nodeobj,
-                            'Root1_label_node': label_leaves_list_to_tree(root1.leaves_label([]), root1.nodeobj),
-                            'Root2_label':root2.label, 
-                            'Root2_node':root2.nodeobj, 
-                            'Root2_seq':oroot2.nodeobj,
-                            'Root2_label_node': label_leaves_list_to_tree(root2.leaves_label([]), root2.nodeobj),
+                            'Root1_label':root1.label + ';', 
+                            'Root1_node':root1.nodeobj + ';',
+                            'Root1_seq':oroot1.nodeobj + ';',
+                            'Root1_label_node': label_leaves_list_to_tree(root1.leaves_label([]), root1.nodeobj) + ';',
+                            'Root2_label':root2.label + ';', 
+                            'Root2_node':root2.nodeobj + ';', 
+                            'Root2_seq':oroot2.nodeobj + ';',
+                            'Root2_label_node': label_leaves_list_to_tree(root2.leaves_label([]), root2.nodeobj) + ';',
                             'Root1_match': list_tmp1,
                             'Root2_match': list_tmp2,
                             'Root1_match_tree': ''.join(tree_tmp1),
                             'Root2_match_tree': ''.join(tree_tmp2),
+                            'Root1_match_label_tree': ''.join(tree_tmp3),
+                            'Root2_match_label_tree': ''.join(tree_tmp4),
                             'Root1_prune':where_prune(list_tmp1, list(map(lambda x:x.label,root1.leaves([])))),
                             'Root2_prune':where_prune(list_tmp2, list(map(lambda x:x.label,root2.leaves([])))),
                             'row':root1.node_count()-1, 
@@ -649,6 +662,7 @@ def scoremat(TreeSeqFile:str,
 
         mat_tmp = deepcopy(matrix_values)
         mat_tmp2 = deepcopy(matrix_values)
+        mat_tmp3 = deepcopy(matrix_values)
         scorelist=[]
         for jjj in range(top):
             #print(mat_tmp)
@@ -658,12 +672,18 @@ def scoremat(TreeSeqFile:str,
             
             list_tmp1 = []
             list_tmp2 = []
+            mat_tmp[del_i_index,del_j_index] = -99999.
+            changemat([del_i_index,del_j_index],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
+            
             tree_tmp1 = ['(']
             tree_tmp2 = ['(']
-            mat_tmp[del_i_index,del_j_index] = -99999.
             mat_tmp2[del_i_index,del_j_index] = -99999.
-            changemat([del_i_index,del_j_index],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
             getmatchtree([del_i_index,del_j_index],lllnode_obj, llllnode_obj, trace_value,mat_tmp2, tree_tmp1, tree_tmp2)
+           
+            tree_tmp3 = ['(']
+            tree_tmp4 = ['(']
+            mat_tmp3[del_i_index,del_j_index] = -99999.
+            getmatchtree([del_i_index,del_j_index],lllnode_label, llllnode_label, trace_value,mat_tmp3, tree_tmp3, tree_tmp4)
             
             #if list_tmp1[0] != lllnode[del_i_index].label:
             #    list_tmp1.insert(0,lllnode[del_i_index].label)
@@ -674,7 +694,7 @@ def scoremat(TreeSeqFile:str,
                     percent = 0
                 else:
                     percent = (len(list(set(list_tmp1) - set(scorelist[-1]['Root1_match'])) + list(set(scorelist[-1]['Root1_match']) - set(list_tmp1))) / len(scorelist[-1]['Root1_match']))*100.
-                if round(percent) < overlap:
+                if round(percent) < diff:
                     #print(round(percent))
                     maxscore = np.max(mat_tmp)
                     del_i_index = np.where(mat_tmp==np.max(mat_tmp))[0][0]
@@ -684,24 +704,37 @@ def scoremat(TreeSeqFile:str,
                     list_tmp2 = []
                     mat_tmp[del_i_index,del_j_index] = -99999.
                     changemat([del_i_index,del_j_index],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
+                    
+                    tree_tmp1 = ['(']
+                    tree_tmp2 = ['(']
+                    mat_tmp2[del_i_index,del_j_index] = -99999.
                     getmatchtree([del_i_index,del_j_index],lllnode_obj, llllnode_obj, trace_value,mat_tmp2, tree_tmp1, tree_tmp2)
                     
+                    tree_tmp3 = ['(']
+                    tree_tmp4 = ['(']
+                    mat_tmp3[del_i_index,del_j_index] = -99999.
+                    getmatchtree([del_i_index,del_j_index],lllnode_label, llllnode_label, trace_value,mat_tmp3, tree_tmp3, tree_tmp4)
+                            
             tree_tmp1.append(');')
-            tree_tmp2.append(');')     
+            tree_tmp2.append(');')
+            tree_tmp3.append(');')
+            tree_tmp4.append(');')             
                 
             scorelist.append({'Score':maxscore,
-                            'Root1_label':lllnode[del_i_index].label, 
-                            'Root1_node':lllnode[del_i_index].nodeobj,
-                            'Root1_seq':olllnode[del_i_index].nodeobj,
-                            'Root1_label_node': label_leaves_list_to_tree(lllnode[del_i_index].leaves_label([]), lllnode[del_i_index].nodeobj),
-                            'Root2_label':llllnode[del_j_index].label, 
-                            'Root2_node':llllnode[del_j_index].nodeobj, 
-                            'Root2_seq':ollllnode[del_j_index].nodeobj, 
-                            'Root2_label_node': label_leaves_list_to_tree(llllnode[del_j_index].leaves_label([]), llllnode[del_j_index].nodeobj),
+                            'Root1_label':lllnode[del_i_index].label + ';', 
+                            'Root1_node':lllnode[del_i_index].nodeobj + ';',
+                            'Root1_seq':olllnode[del_i_index].nodeobj + ';',
+                            'Root1_label_node': label_leaves_list_to_tree(lllnode[del_i_index].leaves_label([]), lllnode[del_i_index].nodeobj) + ';',
+                            'Root2_label':llllnode[del_j_index].label + ';', 
+                            'Root2_node':llllnode[del_j_index].nodeobj + ';', 
+                            'Root2_seq':ollllnode[del_j_index].nodeobj + ';', 
+                            'Root2_label_node': label_leaves_list_to_tree(llllnode[del_j_index].leaves_label([]), llllnode[del_j_index].nodeobj) + ';',
                             'Root1_match': list_tmp1,
                             'Root2_match': list_tmp2,
                             'Root1_match_tree': ''.join(tree_tmp1),
                             'Root2_match_tree': ''.join(tree_tmp2),
+                            'Root1_match_label_tree': ''.join(tree_tmp3),
+                            'Root2_match_label_tree': ''.join(tree_tmp4),
                             'Root1_prune':where_prune(list_tmp1, list(map(lambda x:x.label,lllnode[del_i_index].leaves([])))),
                             'Root2_prune':where_prune(list_tmp2, list(map(lambda x:x.label,llllnode[del_j_index].leaves([])))),
                             'row':del_i_index, 
@@ -711,7 +744,7 @@ def scoremat(TreeSeqFile:str,
 
         #print(ttrace)
         #print(mat_tmp)
-        #print(overlap)
+        #print(diff)
         #print(root1.node_count()*root2.node_count())
         return({'matrix':mmatrix, 
                 'tree1_leaves_nodename': oroot1_label2celltype[1],
@@ -794,18 +827,20 @@ class OP:
                 seq2_list_result, 
                 ScoreDictFile, 
                 poolnum=1, 
-                mv: float = 2., 
+                mav: float = 2., 
+                miv: float = -1.,
                 pv: float = -1., 
                 notebook:int = 0, 
                 Tqdm:int = 1,
-                merge:int = 0,):
+                merge:float=10.,):
         # 直接调用 Manager 提供的 list() 和 dict()
         self.manager = mp.Manager
         self.mp_lst = self.manager().list()
         self.Seq1_list = seq1_list_result
         self.Seq2_list = seq2_list_result
         self.scoredictfile = ScoreDictFile
-        self.mv = mv
+        self.mav = mav
+        self.miv = miv
         self.pv = pv
         self.notebook = notebook
         self.Tqdm = notebook
@@ -840,9 +875,9 @@ class OP:
 
         score_dict = {}
         if scoredictfile == '':
-            score_dict = Scoredict(root1_tmp.leaves([]), root2_tmp.leaves([]), self.mv)
+            score_dict = Scoredict(root1_tmp.leaves([]), root2_tmp.leaves([]), self.mav, self.miv)
         else:
-            score_dict = QuantitativeScoreFile(root1_tmp.leaves([]), root2_tmp.leaves([]), self.mv, ScoreDictFile)
+            score_dict = QuantitativeScoreFile(root1_tmp.leaves([]), root2_tmp.leaves([]), self.mav, self.miv, ScoreDictFile)
 
         mmatrix = pd.DataFrame([[0.0 for i in range(len(llllnode_tmp))] for j in range(len(lllnode_tmp))],
                                index=[i.nodeobj for i in lllnode_tmp],
@@ -918,11 +953,12 @@ def pvalue(times: int,
            topscorelist, 
            ScoreDictFile: str = '', 
            CPUs: int = 50, 
-           mv: float = 2., 
+           mav: float = 2., 
+           miv: float = -1., 
            pv: float = -1.,
            notebook: int = 0,
            Tqdm: int = 1,
-           merge:int = 0,
+           merge:float = 10.,
            ):
     Seq1_list_result_max = []
     Seq2_list_result_max = []
@@ -934,7 +970,7 @@ def pvalue(times: int,
     #print(len(topscorelist))
     for i in range(len(topscorelist)):
         op_max = OP(
-            Seq1_list_result_max[i], Seq2_list_result_max[i], ScoreDictFile, CPUs, mv, pv, notebook, Tqdm, merge)
+            Seq1_list_result_max[i], Seq2_list_result_max[i], ScoreDictFile, CPUs, mav, miv, pv, notebook, Tqdm, merge)
         op_max.flow()
         score_list_max.append(op_max.mp_lst + [topscorelist[i]['Score']])
 
@@ -948,12 +984,13 @@ if __name__ == '__main__':
                          Name2TypeFile = Name2TypeFile,
                          Name2TypeFile2 = Name2TypeFile2,
                          ScoreDictFile = ScoreDictFile,
-                         mv = mv,
+                         mav = mav,
+                         miv = miv,
                          top = top,
                          notebook = notebook,
                          pv = pv,
                          Tqdm = Tqdm,
-                         overlap = overlap,
+                         diff = diff,
                          merge = merge) 
     print("\n********** Score Matrix **********\n", example['matrix'])
              
@@ -989,7 +1026,8 @@ if __name__ == '__main__':
                topscorelist = example['T1root_T2root'] if top == 0 else example['TopScoreList'], 
                ScoreDictFile = ScoreDictFile,
                CPUs = CPUs, 
-               mv = mv, 
+               mav = mav, 
+               miv = miv, 
                pv = pv,
                notebook = notebook,
                Tqdm = Tqdm)

@@ -75,7 +75,7 @@ def GetMaxScore(trace,
                 prune=-1.,
                 dict_score={},
                 Algorithm:str = 'KM',
-                merge:float = 10
+                merge:float = 10.
                 ):
     # 如果两棵树都是，即是根节点也是叶节点（单一元素），直接查字典，查不到就划归为罚分值prune
     root1node = root1
@@ -221,10 +221,11 @@ def GetMaxScore(trace,
                     trace[root1_index][root2_index].append([root1_index,j[1]])
                 #score = max(allmatrix[root1_index,j[1]] + prune*(r2leaf - j[0].leaf_count()), score)      
         
-        
+        #print()
         if (abs(merge - (10)) < 1e-10):
             pass
         else:
+            #print("merge:",merge)
             #print(root1.label, root1.node_count(), root2.label, root2.node_count())
             #print(root1.node_count() - root1.leaf_count() - 1, root2.node_count() - root2.leaf_count() - 1)
             #print(root1.nodeobj, root2.nodeobj)
@@ -232,11 +233,11 @@ def GetMaxScore(trace,
             root2_leaves_nodeobj = []
             root1_leaves_label = []
             root2_leaves_label = []
-            for i in root1.leaves_label_nodeobj([]):
+            for i in root1.leaves([]):
                 root1_leaves_nodeobj.append(i.nodeobj)
                 root1_leaves_label.append(i.label)
                 #print('Leav：',i.label)
-            for j in root2.leaves_label_nodeobj([]):
+            for j in root2.leaves([]):
                 root2_leaves_nodeobj.append(j.nodeobj)
                 root2_leaves_label.append(j.label)
                 #print('Leav：',j.label)

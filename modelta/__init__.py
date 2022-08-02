@@ -181,12 +181,12 @@ class MultiTree:
                 #第一个子节点都是父节点的左节点
                 #后续子节点就是上一个子节点的右节点 
                 #赋予label
-                    label = str(index) if self.label == 'root' else self_tmp.label+','+str(index)    
+                    label = str(index) if self.label == 'root' else self_tmp.label+'_'+str(index)    
                     self.left = MultiTree(item,label=label)
                     self = self.left
                     self.CreatTree()
                 else:
-                    label = str(index) if not ',' in self.label else self_tmp.label+','+str(index)    
+                    label = str(index) if not '_' in self.label else self_tmp.label+'_'+str(index)    
                     self.right = MultiTree(item,label=label)
                     self = self.right
                     self.CreatTree()
@@ -294,10 +294,10 @@ def label_leaves_list_to_tree(label_list, tree_str):
             str_tmp += i
         elif i == ',':
             if str_tmp[-1] == ')':
-                str_tmp += '|'
+                str_tmp += ','
             else:
                 str_tmp += label_list[flag]
-                str_tmp += '|'
+                str_tmp += ','
                 flag +=1
         elif i == ')':
             if str_tmp[-1] == ')':
@@ -347,6 +347,7 @@ def scoremat(TreeSeqFile:str,
     lll = root1.nodes({}) #二维表示
     lllnode = [j for i in lll for j in i]
     lllnode_obj = [j.nodeobj for i in lll for j in i]
+    lllnode_label = [j.label for i in lll for j in i]
     # get root1 leaves' new label to celltype infos
     root1_label2celltype = leafLable_to_celltype_info(lllnode)
 
@@ -368,6 +369,7 @@ def scoremat(TreeSeqFile:str,
     llll = root2.nodes({}) #二维表示
     llllnode = [j for i in llll for j in i]
     llllnode_obj = [j.nodeobj for i in llll for j in i]
+    llllnode_label = [j.label for i in llll for j in i]
     # get root2 leaves' new label to celltype infos
     root2_label2celltype = leafLable_to_celltype_info(llllnode)
 
@@ -543,22 +545,32 @@ def scoremat(TreeSeqFile:str,
         getmatchtree([-1,-1],lllnode_obj, llllnode_obj, trace_value,mat_tmp2, tree_tmp1, tree_tmp2)
         tree_tmp1.append(');')
         tree_tmp2.append(');')
+
+        mat_tmp3 = deepcopy(matrix_values)
+        tree_tmp3 = ['(']
+        tree_tmp4 = ['(']
+        mat_tmp3[-1,-1] = -99999.
+        getmatchtree([-1,-1],lllnode_label, llllnode_label, trace_value,mat_tmp3, tree_tmp3, tree_tmp4)
+        tree_tmp3.append(');')
+        tree_tmp4.append(');')
         
         #list_tmp1.insert(0,root1.label)
         #list_tmp2.insert(0,root2.label)
         T1root_T2root.append({'Score':matrix_values[-1][-1],
-                            'Root1_label':root1.label, 
-                            'Root1_node':root1.nodeobj,
-                            'Root1_seq':oroot1.nodeobj,
-                            #'Root1_label_node': label_leaves_list_to_tree(root1.leaves_label([]), root1.nodeobj),
-                            'Root2_label':root2.label, 
-                            'Root2_node':root2.nodeobj, 
-                            'Root2_seq':oroot2.nodeobj,
-                            #'Root2_label_node': label_leaves_list_to_tree(root2.leaves_label([]), root2.nodeobj),
+                            'Root1_label':root1.label + ';', 
+                            'Root1_node':root1.nodeobj + ';',
+                            'Root1_seq':oroot1.nodeobj + ';',
+                            'Root1_label_node': label_leaves_list_to_tree(root1.leaves_label([]), root1.nodeobj) + ';',
+                            'Root2_label':root2.label + ';', 
+                            'Root2_node':root2.nodeobj + ';', 
+                            'Root2_seq':oroot2.nodeobj + ';',
+                            'Root2_label_node': label_leaves_list_to_tree(root2.leaves_label([]), root2.nodeobj) + ';',
                             'Root1_match': list_tmp1,
                             'Root2_match': list_tmp2,
                             'Root1_match_tree': ''.join(tree_tmp1),
                             'Root2_match_tree': ''.join(tree_tmp2),
+                            'Root1_match_label_tree': ''.join(tree_tmp3),
+                            'Root2_match_label_tree': ''.join(tree_tmp4),
                             'Root1_prune':where_prune(list_tmp1, list(map(lambda x:x.label,root1.leaves([])))),
                             'Root2_prune':where_prune(list_tmp2, list(map(lambda x:x.label,root2.leaves([])))),
                             'row':root1.node_count()-1, 
@@ -578,6 +590,7 @@ def scoremat(TreeSeqFile:str,
 
         mat_tmp = deepcopy(matrix_values)
         mat_tmp2 = deepcopy(matrix_values)
+        mat_tmp3 = deepcopy(matrix_values)
         scorelist=[]
         for jjj in range(top):
             #print(mat_tmp)
@@ -587,12 +600,18 @@ def scoremat(TreeSeqFile:str,
             
             list_tmp1 = []
             list_tmp2 = []
+            mat_tmp[del_i_index,del_j_index] = -99999.
+            changemat([del_i_index,del_j_index],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
+            
             tree_tmp1 = ['(']
             tree_tmp2 = ['(']
-            mat_tmp[del_i_index,del_j_index] = -99999.
             mat_tmp2[del_i_index,del_j_index] = -99999.
-            changemat([del_i_index,del_j_index],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
             getmatchtree([del_i_index,del_j_index],lllnode_obj, llllnode_obj, trace_value,mat_tmp2, tree_tmp1, tree_tmp2)
+           
+            tree_tmp3 = ['(']
+            tree_tmp4 = ['(']
+            mat_tmp3[del_i_index,del_j_index] = -99999.
+            getmatchtree([del_i_index,del_j_index],lllnode_label, llllnode_label, trace_value,mat_tmp3, tree_tmp3, tree_tmp4)
             
             #if list_tmp1[0] != lllnode[del_i_index].label:
             #    list_tmp1.insert(0,lllnode[del_i_index].label)
@@ -613,24 +632,37 @@ def scoremat(TreeSeqFile:str,
                     list_tmp2 = []
                     mat_tmp[del_i_index,del_j_index] = -99999.
                     changemat([del_i_index,del_j_index],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
+                    
+                    tree_tmp1 = ['(']
+                    tree_tmp2 = ['(']
+                    mat_tmp2[del_i_index,del_j_index] = -99999.
                     getmatchtree([del_i_index,del_j_index],lllnode_obj, llllnode_obj, trace_value,mat_tmp2, tree_tmp1, tree_tmp2)
                     
+                    tree_tmp3 = ['(']
+                    tree_tmp4 = ['(']
+                    mat_tmp3[del_i_index,del_j_index] = -99999.
+                    getmatchtree([del_i_index,del_j_index],lllnode_label, llllnode_label, trace_value,mat_tmp3, tree_tmp3, tree_tmp4)
+                    
             tree_tmp1.append(');')
-            tree_tmp2.append(');')     
+            tree_tmp2.append(');')
+            tree_tmp3.append(');')
+            tree_tmp4.append(');')     
                 
             scorelist.append({'Score':maxscore,
-                            'Root1_label':lllnode[del_i_index].label, 
-                            'Root1_node':lllnode[del_i_index].nodeobj,
-                            'Root1_seq':olllnode[del_i_index].nodeobj,
-                            #'Root1_label_node': label_leaves_list_to_tree(lllnode[del_i_index].leaves_label([]), lllnode[del_i_index].nodeobj),
-                            'Root2_label':llllnode[del_j_index].label, 
-                            'Root2_node':llllnode[del_j_index].nodeobj, 
-                            'Root2_seq':ollllnode[del_j_index].nodeobj, 
-                            #'Root2_label_node': label_leaves_list_to_tree(llllnode[del_j_index].leaves_label([]), llllnode[del_j_index].nodeobj),
+                            'Root1_label':lllnode[del_i_index].label + ';', 
+                            'Root1_node':lllnode[del_i_index].nodeobj + ';',
+                            'Root1_seq':olllnode[del_i_index].nodeobj + ';',
+                            'Root1_label_node': label_leaves_list_to_tree(lllnode[del_i_index].leaves_label([]), lllnode[del_i_index].nodeobj) + ';',
+                            'Root2_label':llllnode[del_j_index].label + ';', 
+                            'Root2_node':llllnode[del_j_index].nodeobj + ';', 
+                            'Root2_seq':ollllnode[del_j_index].nodeobj + ';', 
+                            'Root2_label_node': label_leaves_list_to_tree(llllnode[del_j_index].leaves_label([]), llllnode[del_j_index].nodeobj) + ';',
                             'Root1_match': list_tmp1,
                             'Root2_match': list_tmp2,
                             'Root1_match_tree': ''.join(tree_tmp1),
                             'Root2_match_tree': ''.join(tree_tmp2),
+                            'Root1_match_label_tree': ''.join(tree_tmp3),
+                            'Root2_match_label_tree': ''.join(tree_tmp4),
                             'Root1_prune':where_prune(list_tmp1, list(map(lambda x:x.label,lllnode[del_i_index].leaves([])))),
                             'Root2_prune':where_prune(list_tmp2, list(map(lambda x:x.label,llllnode[del_j_index].leaves([])))),
                             'row':del_i_index, 
