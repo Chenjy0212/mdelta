@@ -12,9 +12,9 @@ from shutil import rmtree
 from setuptools import find_packages, setup, Command
 
 # Package meta-data.
-NAME = 'modelta'
+NAME = 'mdelta'
 DESCRIPTION = 'Chen and Yang Lab Multi fork Development cell lineage tree alignment '
-URL = 'https://github.com/Chenjy0212/modelta'
+URL = 'https://github.com/Chenjy0212/mdelta'
 EMAIL = '1026224216@qq.com'
 AUTHOR = 'EeWhile(Jingyu Chen)'
 REQUIRES_PYTHON = '>=3.6.0'
