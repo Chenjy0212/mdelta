@@ -2,12 +2,12 @@
 
 # mDELTA: an algorithm for *m*ultifuricating *D*evelopmental c*E*ll *L*ineage *T*ree *A*lignment.
 
-<a href="https://github.com/Chenjy0212/modelta/blob/main/image/mDELTAt.png/"><img src="https://github.com/Chenjy0212/modelta/blob/main/image/mDELTAt.png" height="500" align="right" /></a>
+<a href="https://github.com/Chenjy0212/mdelta/blob/main/image/mDELTAt.png/"><img src="https://github.com/Chenjy0212/mdelta/blob/main/image/mDELTAt.png" height="500" align="right" /></a>
 
 [![PyPI - Python
-Version](https://img.shields.io/pypi/pyversions/DecryptLogin?logo=python&labelColor=white)](https://pypi.org/project/modelta/)
-[![PyPI](https://img.shields.io/pypi/v/DecryptLogin)](https://pypi.org/project/modelta)
-[![license](https://img.shields.io/github/license/Chenjy0212/modelta.svg)](https://github.com/Chenjy0212/modelta/blob/main/LICENSE)
+Version](https://img.shields.io/pypi/pyversions/DecryptLogin?logo=python&labelColor=white)](https://pypi.org/project/mdelta/)
+[![PyPI](https://img.shields.io/pypi/v/DecryptLogin)](https://pypi.org/project/mdelta)
+[![license](https://img.shields.io/github/license/Chenjy0212/mdelta.svg)](https://github.com/Chenjy0212/mdelta/blob/main/LICENSE)
 
   - **mDELTA** is an algorithm for *m*ultifuricating *D*evelopmental
     c*E*ll *L*ineage *T*ree *A*lignment. In essence, it compares two
@@ -33,14 +33,14 @@ Version](https://img.shields.io/pypi/pyversions/DecryptLogin?logo=python&labelCo
     Yat-Sen University in China.
 
 For details, please visit
-<https://github.com/Chenjy0212/modelta/blob/main/README2.md/>.
+<https://github.com/Chenjy0212/mdelta/blob/main/README2.md/>.
 
 # Quick start
 
 #### Installation
 
 ``` sh
-pip install modelta
+pip install mdelta
 ```
 
 This will install **mDELTA** and its prerequisites
@@ -101,7 +101,7 @@ optional arguments:
                         [float] This is the scaling factor for calculating the score of merging an internal node (e.g. -mg -1),
                         which is multiplied by the number of tips of the internal node to be merged. Default to 0.
 
-More details on https://github.com/Chenjy0212/modelta
+More details on https://github.com/Chenjy0212/mdelta
 ```
 
 #### Aligning a tree with itself, output top three local alignments
@@ -143,19 +143,19 @@ Stars](https://img.shields.io/github/stars/Chenjy0212?color=faf408&label=github%
 [![gmail](https://img.shields.io/badge/Gmail-cjy1026224216@gmail.com-orange?logo=Gmail&labelColor=white)](https://mail.google.com/mail)<br>
 [![sysu](https://img.shields.io/badge/%20SYSU-系统与进化基因组学实验室-black?logo=data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48c3ZnIHZlcnNpb249IjEuMSIgaWQ9IkxheWVyXzEiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMTAyLjM0IDEyMi44OCIgc3R5bGU9ImVuYWJsZS1iYWNrZ3JvdW5kOm5ldyAwIDAgMTAyLjM0IDEyMi44OCIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHN0eWxlIHR5cGU9InRleHQvY3NzIj48IVtDREFUQVsNCgkuc3Qwe2ZpbGwtcnVsZTpldmVub2RkO2NsaXAtcnVsZTpldmVub2RkO30NCl1dPjwvc3R5bGU+PGc+PHBhdGggY2xhc3M9InN0MCIgZD0iTTUzLjM2LDMuMzFjOC43LTYuMDEsOS4zNSw1Ljg5LDE3Ljg5LTEuNTVWMTMuOWMtOC4xNCw3LjMzLTkuOS00LjUxLTE3Ljg5LDEuNVYzLjMxTDUzLjM2LDMuMzFMNTMuMzYsMy4zMXogTTQ5LjQ1LDM3LjAxaDEuNTJjMC4yOCwwLDAuNSwwLjIzLDAuNSwwLjV2NS44NGg1LjMzYzAuMjgsMCwwLjUsMC4yMywwLjUsMC41djEuNTJjMCwwLjI4LTAuMjMsMC41LTAuNSwwLjVoLTcuODZ2LTguMzcgQzQ4Ljk0LDM3LjI0LDQ5LjE3LDM3LjAxLDQ5LjQ1LDM3LjAxTDQ5LjQ1LDM3LjAxTDQ5LjQ1LDM3LjAxeiBNNTEuMTcsMzAuMTdjNi44NSwwLDEyLjQsNS41NSwxMi40LDEyLjQgYzAsNi44NS01LjU1LDEyLjQtMTIuNCwxMi40Yy02Ljg1LDAtMTIuNC01LjU1LTEyLjQtMTIuNEMzOC43NywzNS43Myw0NC4zMiwzMC4xNyw1MS4xNywzMC4xN0w1MS4xNywzMC4xN0w1MS4xNywzMC4xN3ogTTUyLjg3LDcxLjc0djQwLjI3aDEyLjI1VjcxLjc0SDUyLjg3TDUyLjg3LDcxLjc0eiBNNDkuNDcsMTEyLjAxVjcxLjc0SDM3LjIybDAsMHY0MC4yN0g0OS40N0w0OS40NywxMTIuMDF6IE0xMDIuMzQsMTIyLjg1IFY1MS44Nkg3NS4zOFYzNC42N0w1Mi4xMywxOS42OVYzLjA5aC0wLjA4YzAuNDktMC4yOCwwLjgxLTAuODIsMC44MS0xLjQzYzAtMC45Mi0wLjc0LTEuNjYtMS42Ni0xLjY2cy0xLjY2LDAuNzQtMS42NiwxLjY2IGMwLDAuNjEsMC4zMywxLjE0LDAuODEsMS40M2gtMC4wOHYxNi41N2wtMjMuMywxNS4wMXYxNy4xOUg3LjIzSDB2NzEuMDJDMzQuMTIsMTIyLjg4LDY4LjIyLDEyMi44NSwxMDIuMzQsMTIyLjg1TDEwMi4zNCwxMjIuODUgTDEwMi4zNCwxMjIuODV6IE0xMC45OSw3MS43NGgxMy40OXY1LjI1SDEwLjk5VjcxLjc0TDEwLjk5LDcxLjc0TDEwLjk5LDcxLjc0eiBNNzcuODUsNzEuNzRoMTMuNDl2NS4yNUg3Ny44NVY3MS43NEw3Ny44NSw3MS43NCBMNzcuODUsNzEuNzR6IE0xMC45OSw4My4zM2gxMy40OXY1LjI1SDEwLjk5VjgzLjMzTDEwLjk5LDgzLjMzTDEwLjk5LDgzLjMzeiBNNzcuODUsODMuMzNoMTMuNDl2NS4yNUg3Ny44NVY4My4zM0w3Ny44NSw4My4zMyBMNzcuODUsODMuMzN6IE0xMC45OSw5NC45MmgxMy40OXY1LjI1SDEwLjk5Vjk0LjkyTDEwLjk5LDk0LjkyTDEwLjk5LDk0LjkyeiBNNzcuODUsOTQuOTJoMTMuNDl2NS4yNUg3Ny44NVY5NC45Mkw3Ny44NSw5NC45MiBMNzcuODUsOTQuOTJ6IE0xMC45OSwxMDYuNTFoMTMuNDl2NS4yNUgxMC45OVYxMDYuNTFMMTAuOTksMTA2LjUxTDEwLjk5LDEwNi41MXogTTc3Ljg1LDEwNi41MWgxMy40OXY1LjI1SDc3Ljg1VjEwNi41MSBMNzcuODUsMTA2LjUxTDc3Ljg1LDEwNi41MXoiLz48L2c+PC9zdmc+&labelColor=darkgreen)](https://www.labxing.com/lab/719/members)
 
-<img alt="sysulogo" src="https://github.com/Chenjy0212/modelta/blob/main/image/sysulogo.png" width=400 />
+<img alt="sysulogo" src="https://github.com/Chenjy0212/mdelta/blob/main/image/sysulogo.png" width=400 />
 
 </ul>
 
 If you use this project in your research, please cite this project.
 
 ``` latex
-@misc{modelta2022,
+@misc{mdelta2022,
     author = {Jingyu Chen},
     title = {mDELTA: Multifuricating Developmental cEll Lineage Tree Alignment},
     year = {2022},
     publisher = {GitHub},
     journal = {GitHub repository},
-    howpublished = {\url{https://github.com/Chenjy0212/modelta}},
+    howpublished = {\url{https://github.com/Chenjy0212/mdelta}},
 }
 ```
