@@ -370,7 +370,7 @@ class OP:
                 mav: float = 2., 
                 miv: float = -1., 
                 pv: float = -1., 
-                notebook:bool = False, 
+                notebook:int = 0, 
                 Tqdm:bool = True,
                 merge:float = 10,
                 ):
@@ -498,7 +498,7 @@ def pvalue(times: int,
            mav: float = 2., 
            miv: float = -1.,
            pv: float = -1.,
-           notebook: bool = False,
+           notebook: int = 0,
            Tqdm: bool = True,
            merge:float = 10,
            ):

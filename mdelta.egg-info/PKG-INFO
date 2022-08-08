@@ -1,3 +1,22 @@
+Metadata-Version: 2.1
+Name: mdelta
+Version: 1.0.32
+Summary: Chen and Yang Lab Multi fork Development cell lineage tree alignment 
+Home-page: https://github.com/Chenjy0212/mdelta
+Author: EeWhile(Jingyu Chen)
+Author-email: 1026224216@qq.com
+License: MIT
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: Implementation :: CPython
+Classifier: Programming Language :: Python :: Implementation :: PyPy
+Requires-Python: >=3.6.0
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # mDELTA: an algorithm for *m*ultifuricating *D*evelopmental c*E*ll *L*ineage *T*ree *A*lignment.
@@ -33,9 +52,7 @@ Version](https://img.shields.io/pypi/pyversions/DecryptLogin?logo=python&labelCo
     Yat-Sen University in China.
 
 For details, please visit
-<https://github.com/Chenjy0212/mdelta/blob/main/README2.md/>
-
-[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=Chenjy0212&repo=mdelta)](https://github.com/Chenjy0212/mdelta)
+<https://github.com/Chenjy0212/mdelta/blob/main/README2.md/>.
 
 # Quick start
 

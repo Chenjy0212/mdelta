@@ -7,10 +7,10 @@ import math
 # 读取 .nwk类文件并把谱系树中的节点名称转换为类型
 # 例如   (a1,b7); ---> (a,b);
 def ReadTreeSeq_Name2Type(TreeSeqFilePath, Name2TypeFilePath):
-    file1= open(TreeSeqFilePath,encoding='utf-8') #读取到文本的所有内容
+    file1= open(TreeSeqFilePath, 'r', encoding="ISO-8859-1") #读取到文本的所有内容
     content=file1.read()
     #print(content)
-    file2= open(Name2TypeFilePath,encoding='utf-8')
+    file2= open(Name2TypeFilePath,'r', encoding="ISO-8859-1")
     file2.readline() #跳过第一行
     while True:
         text_line = file2.readline().replace('\n', '')
@@ -29,7 +29,7 @@ def ReadTreeSeq_Name2Type(TreeSeqFilePath, Name2TypeFilePath):
     return content.replace(';', '')
 
 def ReadTreeSeq(TreeSeqFilePath):
-    file1= open(TreeSeqFilePath,encoding='utf-8') #读取到文本的所有内容
+    file1= open(TreeSeqFilePath,'r', encoding="ISO-8859-1") #读取到文本的所有内容
     content=file1.read()
     #print(content)
     return content.replace(';', '')
@@ -65,7 +65,7 @@ def QuantitativeScoreFile(lllleaf, llllleaf, mav:float, miv:float, ScoreFile, ma
     for i in llllleaf:
         score_dict[i.nodeobj+'_'+i.nodeobj] = float(mav)
     typeXn_dict = {}
-    csv_reader=csv.reader(open(ScoreFile,encoding='utf-8'))
+    csv_reader=csv.reader(open(ScoreFile,'r', encoding="ISO-8859-1"))
     for row in islice(csv_reader, 1, None): #跳过第一行名称信息
         #print(row)
         if len(row) == 3:
