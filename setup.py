@@ -18,7 +18,7 @@ URL = 'https://github.com/Chenjy0212/mdelta'
 EMAIL = '1026224216@qq.com'
 AUTHOR = 'EeWhile(Jingyu Chen)'
 REQUIRES_PYTHON = '>=3.6.0'
-VERSION = '1.0.32'
+VERSION = '1.0.34'
 
 # What packages are required for this module to be executed?
 REQUIRED = [
