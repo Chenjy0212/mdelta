@@ -104,7 +104,7 @@ class MultiTree:
             return 1 + max(self.left.height(), self.right.height())
     # 鍘熸潵鐨勫鍙夋爲鐨勫彾瀛愯妭鐐?
 
-    def leaves(self,ll=[],flag = 1): #意味 0 这个是叶子节点
+    def leaves(self, ll=[], flag=1):  # 意味 0 这个是叶子节点
         if self is None:
             return None
         if flag == 1:
@@ -113,17 +113,17 @@ class MultiTree:
                 return ll
             else:
                 self = self.left
-        
+
         if self.left is not None:
-            self.left.leaves(ll,flag = 0)
+            self.left.leaves(ll, flag=0)
         if self.nodeobj is not None:
             if self.left is None:
                 ll.append(self)
         if self.right is not None:
-            self.right.leaves(ll,flag = 0)
+            self.right.leaves(ll, flag=0)
         return ll
-        
-    def leaves_nodeobj(self,ll=[],flag = 1): #意味 0 这个是叶子节点
+
+    def leaves_nodeobj(self, ll=[], flag=1):  # 意味 0 这个是叶子节点
         if self is None:
             return None
         if flag == 1:
@@ -132,17 +132,17 @@ class MultiTree:
                 return ll
             else:
                 self = self.left
-        
+
         if self.left is not None:
-            self.left.leaves_nodeobj(ll,flag = 0)
+            self.left.leaves_nodeobj(ll, flag=0)
         if self.nodeobj is not None:
             if self.left is None:
                 ll.append(self.nodeobj)
         if self.right is not None:
-            self.right.leaves_nodeobj(ll,flag = 0)
+            self.right.leaves_nodeobj(ll, flag=0)
         return ll
-    
-    def leaves_label(self,ll=[],flag = 1): #意味 0 这个是叶子节点
+
+    def leaves_label(self, ll=[], flag=1):  # 意味 0 这个是叶子节点
         if self is None:
             return None
         if flag == 1:
@@ -151,14 +151,14 @@ class MultiTree:
                 return ll
             else:
                 self = self.left
-        
+
         if self.left is not None:
-            self.left.leaves_label(ll,flag = 0)
+            self.left.leaves_label(ll, flag=0)
         if self.nodeobj is not None:
             if self.left is None:
                 ll.append(self.label)
         if self.right is not None:
-            self.right.leaves_label(ll,flag = 0)
+            self.right.leaves_label(ll, flag=0)
         return ll
 
     def CreatTree(self):
@@ -225,7 +225,7 @@ class MultiTree:
             self.Level()
     # 鍙跺瓙鑺傜偣涓暟,闇€瑕佺殑鏄妭鐐逛笅鐨勫乏鑺傜偣鎵嶆纭?
 
-    def leaf_count(self, flag = 1):
+    def leaf_count(self, flag=1):
         if self is None:
             return 0
         if flag == 1:
@@ -236,14 +236,14 @@ class MultiTree:
         if self.left is None and self.right is None:
             return 1
         elif self.right is not None and self.left is not None:
-            return self.left.leaf_count(flag = 0) + self.right.leaf_count(flag = 0)
+            return self.left.leaf_count(flag=0) + self.right.leaf_count(flag=0)
         elif self.left is None and self.right is not None:
-            return 1 + self.right.leaf_count(flag = 0)
+            return 1 + self.right.leaf_count(flag=0)
         elif self.right is None and self.left is not None:
-            return self.left.leaf_count(flag = 0)
+            return self.left.leaf_count(flag=0)
 
-    #总节点个数
-    def node_count(self, flag = 0):
+    # 总节点个数
+    def node_count(self, flag=0):
         if self is None:
             return 0
         elif self.left is None and self.right is None:
@@ -257,8 +257,8 @@ class MultiTree:
             return 1 + self.right.node_count()
         elif self.right is None and self.left is not None:
             return 1 + self.left.node_count(1)
-        #else:
-            #return self.left.node_count()+ self.right.node_count()
+        # else:
+            # return self.left.node_count()+ self.right.node_count()
 
     def son_count(self):
         self_tmp = self
@@ -315,7 +315,7 @@ def FindNode(Seq: str, times: int) -> list:
     brackets_num = 0  # 括号个数
     node_num = -1  # 节点序号
     node_tmp = ''
-    
+
     for i in list(Seq):
         if i == '(':
             brackets_num += 1
@@ -362,18 +362,18 @@ def FindNode(Seq: str, times: int) -> list:
 
 
 class OP:
-    def __init__(self, 
-                seq1_list_result, 
-                seq2_list_result, 
-                ScoreDictFile, 
-                poolnum=1, 
-                mav: float = 2., 
-                miv: float = -1., 
-                pv: float = -1., 
-                notebook:int = 0, 
-                Tqdm:bool = True,
-                merge:float = 10,
-                ):
+    def __init__(self,
+                 seq1_list_result,
+                 seq2_list_result,
+                 ScoreDictFile,
+                 poolnum=1,
+                 mav: float = 2.,
+                 miv: float = -1.,
+                 pv: float = -1.,
+                 notebook: int = 0,
+                 Tqdm: int = 1,
+                 merge: float = 10,
+                 ):
         # 直接调用 Manager 提供的 list() 和 dict()
         self.manager = mp.Manager
         self.mp_lst = self.manager().list()
@@ -419,7 +419,8 @@ class OP:
             score_dict = Scoredict(root1_tmp.leaves(
                 []), root2_tmp.leaves([]), self.mav, self.miv)
         else:
-            score_dict = QuantitativeScoreFile(root1_tmp.leaves([]),root2_tmp.leaves([]),self.mav, self.miv,scoredictfile)
+            score_dict = QuantitativeScoreFile(root1_tmp.leaves(
+                []), root2_tmp.leaves([]), self.mav, self.miv, scoredictfile)
 
         mmatrix = pd.DataFrame([[0.0 for i in range(len(llllnode_tmp))] for j in range(len(lllnode_tmp))],
                                index=[i.nodeobj for i in lllnode_tmp],
@@ -462,9 +463,11 @@ class OP:
                                                                   dict_score=score_dict,
                                                                   prune=self.pv,
                                                                   Algorithm='',
-                                                                  lll_label = [i.label for i in lll_tmp[0]],
-                                                                  llll_label = [i.label for i in llll_tmp[0]],
-                                                                  merge = self.merge)
+                                                                  lll_label=[
+                                                                      i.label for i in lll_tmp[0]],
+                                                                  llll_label=[
+                                                                      i.label for i in llll_tmp[0]],
+                                                                  merge=self.merge)
         # print(mmatrix)
         # print(ttrace)
         # print(matrix_values[len(lllnode)-1][len(llllnode)-1])
@@ -482,7 +485,7 @@ class OP:
             update = lambda *args: pbar.update()
         else:
             update = None
-            
+
         for i, j in zip(self.Seq1_list, self.Seq2_list):
             pool.apply_async(func=self.Foo, args=(
                 i, j, self.scoredictfile), callback=update)
@@ -491,16 +494,16 @@ class OP:
         pool.join()
 
 
-def pvalue(times: int, 
-           topscorelist, 
-           ScoreDictFile: str = '', 
-           CPUs: int = 50, 
-           mav: float = 2., 
+def pvalue(times: int,
+           topscorelist,
+           ScoreDictFile: str = '',
+           CPUs: int = 50,
+           mav: float = 2.,
            miv: float = -1.,
            pv: float = -1.,
            notebook: int = 0,
-           Tqdm: bool = True,
-           merge:float = 10,
+           Tqdm: int = 1,
+           merge: float = 10,
            ):
     Seq1_list_result_max = []
     Seq2_list_result_max = []
@@ -509,7 +512,7 @@ def pvalue(times: int,
         Seq2_list_result_max.append(FindNode(i['Root2_node'], times))
 
     score_list_max = []
-    #print(len(topscorelist))
+    # print(len(topscorelist))
     for i in range(len(topscorelist)):
         op_max = OP(
             Seq1_list_result_max[i], Seq2_list_result_max[i], ScoreDictFile, CPUs, mav, miv, pv, notebook, Tqdm, merge)
@@ -528,5 +531,3 @@ def pvalue(times: int,
         top_rate.append(per_less_max*100/len(i))
     return(top_rate)
     '''
-    
-

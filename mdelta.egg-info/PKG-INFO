@@ -1,7 +1,7 @@
 Metadata-Version: 2.1
 Name: mdelta
-Version: 1.0.32
-Summary: Chen and Yang Lab Multi fork Development cell lineage tree alignment 
+Version: 1.0.35
+Summary: Multifuricating Developmental cEll Lineage Tree Alignment (mDELTA) algorithm
 Home-page: https://github.com/Chenjy0212/mdelta
 Author: EeWhile(Jingyu Chen)
 Author-email: 1026224216@qq.com
@@ -52,7 +52,9 @@ Version](https://img.shields.io/pypi/pyversions/DecryptLogin?logo=python&labelCo
     Yat-Sen University in China.
 
 For details, please visit
-<https://github.com/Chenjy0212/mdelta/blob/main/README2.md/>.
+<https://github.com/Chenjy0212/mdelta/blob/main/README2.md/>
+
+[![Readme Card](https://github-readme-stats.vercel.app/api/pin/?username=Chenjy0212&repo=mdelta)](https://github.com/Chenjy0212/mdelta)
 
 # Quick start
 

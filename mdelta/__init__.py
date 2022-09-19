@@ -499,7 +499,10 @@ def scoremat(TreeSeqFile:str,
             if isinstance(i[0],int) and isinstance(i[1],int):
                 if i[0]<root1.leaf_count() and i[1] <root2.leaf_count():
                     mat[tuple(i)] = -99999.
-                    if tree_tmp1[-1] == '(': #if tree_tmp2[-1] == '(':
+                    if tree_tmp1 == []:
+                        tree_tmp1.append('('+str(lllnode_obj[i[0]]) + ')')
+                        tree_tmp2.append('('+str(llllnode_obj[i[1]]) + ')')
+                    elif tree_tmp1[-1] == '(': #if tree_tmp2[-1] == '(':
                         tree_tmp1.append(str(lllnode_obj[i[0]]))
                         tree_tmp2.append(str(llllnode_obj[i[1]]))
                     else:
@@ -507,14 +510,13 @@ def scoremat(TreeSeqFile:str,
                         tree_tmp2.append(','+str(llllnode_obj[i[1]]))
                 else:
                     mat[tuple(i)] = -99999.
-                    if tree_tmp1[-1] == '(':
-                        tree_tmp1.append('(')
-                        tree_tmp2.append('(')
-                    else:
+                    if tree_tmp1 == []:
+                        pass
+                    elif tree_tmp1[-1] != '(':
                         tree_tmp1.append(',')
-                        tree_tmp1.append('(')
                         tree_tmp2.append(',')
-                        tree_tmp2.append('(')
+                    tree_tmp1.append('(')
+                    tree_tmp2.append('(')
                     getmatchtree(i, lllnode_obj, llllnode_obj, tracemat_value, mat, tree_tmp1, tree_tmp2)
                     tree_tmp1.append(')')
                     tree_tmp2.append(')')
@@ -539,20 +541,20 @@ def scoremat(TreeSeqFile:str,
         changemat([-1,-1],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
         
         mat_tmp2 = deepcopy(matrix_values)
-        tree_tmp1 = ['(']
-        tree_tmp2 = ['(']
+        tree_tmp1 = []
+        tree_tmp2 = []
         mat_tmp2[-1,-1] = -99999.
         getmatchtree([-1,-1],lllnode_obj, llllnode_obj, trace_value,mat_tmp2, tree_tmp1, tree_tmp2)
-        tree_tmp1.append(');')
-        tree_tmp2.append(');')
+        tree_tmp1.append(';')
+        tree_tmp2.append(';')
 
         mat_tmp3 = deepcopy(matrix_values)
-        tree_tmp3 = ['(']
-        tree_tmp4 = ['(']
+        tree_tmp3 = []
+        tree_tmp4 = []
         mat_tmp3[-1,-1] = -99999.
         getmatchtree([-1,-1],lllnode_label, llllnode_label, trace_value,mat_tmp3, tree_tmp3, tree_tmp4)
-        tree_tmp3.append(');')
-        tree_tmp4.append(');')
+        tree_tmp3.append(';')
+        tree_tmp4.append(';')
         
         #list_tmp1.insert(0,root1.label)
         #list_tmp2.insert(0,root2.label)
@@ -603,13 +605,13 @@ def scoremat(TreeSeqFile:str,
             mat_tmp[del_i_index,del_j_index] = -99999.
             changemat([del_i_index,del_j_index],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
             
-            tree_tmp1 = ['(']
-            tree_tmp2 = ['(']
+            tree_tmp1 = []
+            tree_tmp2 = []
             mat_tmp2[del_i_index,del_j_index] = -99999.
             getmatchtree([del_i_index,del_j_index],lllnode_obj, llllnode_obj, trace_value,mat_tmp2, tree_tmp1, tree_tmp2)
            
-            tree_tmp3 = ['(']
-            tree_tmp4 = ['(']
+            tree_tmp3 = []
+            tree_tmp4 = []
             mat_tmp3[del_i_index,del_j_index] = -99999.
             getmatchtree([del_i_index,del_j_index],lllnode_label, llllnode_label, trace_value,mat_tmp3, tree_tmp3, tree_tmp4)
             
@@ -633,20 +635,20 @@ def scoremat(TreeSeqFile:str,
                     mat_tmp[del_i_index,del_j_index] = -99999.
                     changemat([del_i_index,del_j_index],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
                     
-                    tree_tmp1 = ['(']
-                    tree_tmp2 = ['(']
+                    tree_tmp1 = []
+                    tree_tmp2 = []
                     mat_tmp2[del_i_index,del_j_index] = -99999.
                     getmatchtree([del_i_index,del_j_index],lllnode_obj, llllnode_obj, trace_value,mat_tmp2, tree_tmp1, tree_tmp2)
                     
-                    tree_tmp3 = ['(']
-                    tree_tmp4 = ['(']
+                    tree_tmp3 = []
+                    tree_tmp4 = []
                     mat_tmp3[del_i_index,del_j_index] = -99999.
                     getmatchtree([del_i_index,del_j_index],lllnode_label, llllnode_label, trace_value,mat_tmp3, tree_tmp3, tree_tmp4)
                     
-            tree_tmp1.append(');')
-            tree_tmp2.append(');')
-            tree_tmp3.append(');')
-            tree_tmp4.append(');')     
+            tree_tmp1.append(';')
+            tree_tmp2.append(';')
+            tree_tmp3.append(';')
+            tree_tmp4.append(';')     
                 
             scorelist.append({'Score':maxscore,
                             'Root1_label':lllnode[del_i_index].label + ';', 

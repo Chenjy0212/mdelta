@@ -3,52 +3,46 @@ import itertools
 import csv
 from itertools import islice
 import math
+import re
 
-# ¶ÁÈ¡ .nwkÀàÎÄ¼ş²¢°ÑÆ×ÏµÊ÷ÖĞµÄ½ÚµãÃû³Æ×ª»»ÎªÀàĞÍ
-# ÀıÈç   (a1,b7); ---> (a,b);
+# è¯»å– .nwkç±»æ–‡ä»¶å¹¶æŠŠè°±ç³»æ ‘ä¸­çš„èŠ‚ç‚¹åç§°è½¬æ¢ä¸ºç±»å‹
+# ä¾‹å¦‚   (a1,b7); ---> (a,b);
 def ReadTreeSeq_Name2Type(TreeSeqFilePath, Name2TypeFilePath):
-    file1= open(TreeSeqFilePath, 'r', encoding="ISO-8859-1") #¶ÁÈ¡µ½ÎÄ±¾µÄËùÓĞÄÚÈİ
+    file1= open(TreeSeqFilePath,encoding='utf-8') #è¯»å–åˆ°æ–‡æœ¬çš„æ‰€æœ‰å†…å®¹
     content=file1.read()
+    content=re.sub("\:\d+", "", content)
+    content=re.sub("\)\d+", ")", content)
+    content=content.strip()
     #print(content)
-    file2= open(Name2TypeFilePath,'r', encoding="ISO-8859-1")
-    file2.readline() #Ìø¹ıµÚÒ»ĞĞ
-    while True:
-        text_line = file2.readline().replace('\n', '')
-        if text_line:
-            #print(len(text_line), text_line)
-            name2type = text_line.split(',', 1 )
-            #print(name2type)
-            name = name2type[0]
-            ctype = name2type[1]
-            #print('name:',name,'\t','type:',type)
-            content = content.replace(name, ctype)
-            #print(content)
-        else:
-            break
-    #print(content)
+    file2= open(Name2TypeFilePath,encoding='utf-8')
+    #file2.readline() #è·³è¿‡ç¬¬ä¸€è¡Œ
+    for line in file2:
+        spl = line.strip().split(',')
+        content = content.replace(spl[0], spl[1])
     return content.replace(';', '')
 
 def ReadTreeSeq(TreeSeqFilePath):
-    file1= open(TreeSeqFilePath,'r', encoding="ISO-8859-1") #¶ÁÈ¡µ½ÎÄ±¾µÄËùÓĞÄÚÈİ
+    file1= open(TreeSeqFilePath,encoding='utf-8') #è¯»å–åˆ°æ–‡æœ¬çš„æ‰€æœ‰å†…å®¹
     content=file1.read()
+    content=re.sub("\:\d+", "", content)
+    content=re.sub("\)\d+", ")", content)
+    content=content.strip()
     #print(content)
     return content.replace(';', '')
 
-def Scoredict(lllleaf, llllleaf, mav:float, miv:float):
-    #Èç¹ûÊÇ×Ô¶¯Éú³ÉµÄ»°
-    #¿ÉÒÔÓÃµ½µÑ¿¨¶û»ı
+def Scoredict(lllleaf, llllleaf, mv:float):
+    #å¦‚æœæ˜¯è‡ªåŠ¨ç”Ÿæˆçš„è¯
+    #å¯ä»¥ç”¨åˆ°ç¬›å¡å°”ç§¯
     score_dict = {}
-    for i in itertools.product(set(lllleaf), set(llllleaf)):
-        score_dict[i[0].nodeobj+'_'+i[1].nodeobj] = float(miv)
+    #for i in itertools.product(set(lllleaf), set(llllleaf)):
+    #    score_dict[i[0].nodeobj+'_'+i[1].nodeobj] = float(random.randint(-2,2))
     #score_dict[i[0].nodeobj+'_'+i[1].nodeobj] = random.random()/10
     #print(score_dict)
 
-    #»òÕßÓÃµ½ÏàÍ¬½Úµã²ÅÆ¥Åä
+    #æˆ–è€…ç”¨åˆ°ç›¸åŒèŠ‚ç‚¹æ‰åŒ¹é…
     #score_dict = {}
-    for i in lllleaf:
-        score_dict[i.nodeobj+'_'+i.nodeobj] = float(mav)
-    for i in llllleaf:
-        score_dict[i.nodeobj+'_'+i.nodeobj] = float(mav)
+    for i in lllleaf + llllleaf:
+        score_dict[i.nodeobj+'_'+i.nodeobj] = mv
     return score_dict
 
 def reverseScore(Score, matchScore:float):
@@ -56,27 +50,20 @@ def reverseScore(Score, matchScore:float):
     Score =matchScore-(Score**0.5)
     return Score
 
-def QuantitativeScoreFile(lllleaf, llllleaf, mav:float, miv:float, ScoreFile, matchScore = -999.):
+def QuantitativeScoreFile(ScoreFile, matchScore = -999.):
     score_dict={}
-    for i in itertools.product(set(lllleaf), set(llllleaf)):
-        score_dict[i[0].nodeobj+'_'+i[1].nodeobj] = float(miv)
-    for i in lllleaf:
-        score_dict[i.nodeobj+'_'+i.nodeobj] = float(mav)
-    for i in llllleaf:
-        score_dict[i.nodeobj+'_'+i.nodeobj] = float(mav)
     typeXn_dict = {}
-    csv_reader=csv.reader(open(ScoreFile,'r', encoding="ISO-8859-1"))
-    for row in islice(csv_reader, 1, None): #Ìø¹ıµÚÒ»ĞĞÃû³ÆĞÅÏ¢
+    csv_reader=csv.reader(open(ScoreFile,encoding='utf-8'))
+    for row in islice(csv_reader, 1, None): #è·³è¿‡ç¬¬ä¸€è¡Œåç§°ä¿¡æ¯
         #print(row)
         if len(row) == 3:
-            score_dict[row[0]+ '_' + row[1]] = float(row[2])
-            score_dict[row[1]+ '_' + row[0]] = float(row[2])
+            score_dict[row[0]+ '_' + row[1]] = row[2]
         else:
             typeXn_dict[row[0]]=row[1:]
         #print(list(typeXn_dict.keys()))
         for i in itertools.product(list(typeXn_dict.keys()), list(typeXn_dict.keys())):
             #print(i[0]+ '_' + i[1])
-            # cmath.sqrt() ·µ»ØµÄÊÇcomplex¸´ÊıĞÎÊ½£¬²»ÀûÓÚ¼ÆËã
+            # cmath.sqrt() è¿”å›çš„æ˜¯complexå¤æ•°å½¢å¼ï¼Œä¸åˆ©äºè®¡ç®—
             score_dict[i[0]+ '_' + i[1]] = reverseScore(sum((abs(float(a)**2-float(b)**2)**0.5) for a,b in zip(typeXn_dict[i[0]],typeXn_dict[i[1]])),math.ceil(len(row)**0.5) if matchScore==-999. else matchScore)
     return score_dict
 
@@ -92,3 +79,4 @@ def leafLable_to_celltype_info(node_list):
     ## conver to strings
     
     return ";".join(labels), ";".join(celltypes)
+ 
