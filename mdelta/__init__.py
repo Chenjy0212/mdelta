@@ -474,25 +474,30 @@ def scoremat(TreeSeqFile:str,
                                                                         llll_label = [i.label for i in llll[0]],
                                                                         merge = merge,)
     
-    def changemat(rac, tracemat, tracemat_value, mat, list_tmp1, list_tmp2):
-            for i in tracemat_value[tuple(rac)]:
-                if isinstance(i[0],int) and isinstance(i[1],int):
-                    list_tmp1.append(tracemat.index[i[0]])
-                    list_tmp2.append(tracemat.columns[i[1]])
-                elif not isinstance(i[0],int) and not isinstance(i[1],int):    
-                    list_tmp1.append(tracemat.index[rac[0]])
-                    list_tmp2.append(tracemat.columns[rac[1]])
-                    return
-                #print(i[0],i[0])
-            for i in tracemat_value[tuple(rac)]:
-                if isinstance(i[0],int) and isinstance(i[1],int):
-                    #print(i[0],root1.leaf_count(), i[1],root2.leaf_count())
-                    if i == [] or (i[0]<root1.leaf_count() and i[1] <root2.leaf_count()):
-                        mat[tuple(i)] = -99999.
-                    else:
-                        mat[tuple(i)] = -99999.
-                        #print(i)
-                        changemat(i, tracemat,tracemat_value, mat, list_tmp1, list_tmp2)
+    def changemat(rac, tracemat, tracemat_value, mat, list_tmp1, list_tmp2, ttused):
+        for i in tracemat_value[tuple(rac)]:
+            if isinstance(i[0],int) and isinstance(i[1],int):
+                list_tmp1.append(tracemat.index[i[0]])
+                #print(tracemat.index[i[0]])
+                list_tmp2.append(tracemat.columns[i[1]])
+                #print(tracemat.index[i[1]])
+            elif not isinstance(i[0],int) and not isinstance(i[1],int):    
+                list_tmp1.append(tracemat.index[rac[0]])
+                #print(tracemat.index[rac[0]])
+                list_tmp2.append(tracemat.columns[rac[1]])
+                return
+                
+            #print(i[0],i[0])
+        for i in tracemat_value[tuple(rac)]:
+            ttused.append(str(i))
+            if isinstance(i[0],int) and isinstance(i[1],int):
+                #print(i[0],root1.leaf_count(), i[1],root2.leaf_count())
+                if i == [] or (i[0]<root1.leaf_count() and i[1] <root2.leaf_count()):
+                    mat[tuple(i)] = -99999.
+                else:
+                    mat[tuple(i)] = -99999.
+                    #print(i)
+                    changemat(i, tracemat,tracemat_value, mat, list_tmp1, list_tmp2, ttused)
             #return mat
     def getmatchtree(rac, lllnode_obj, llllnode_obj, tracemat_value, mat, tree_tmp1, tree_tmp2):
         for i in tracemat_value[tuple(rac)]:
@@ -538,7 +543,8 @@ def scoremat(TreeSeqFile:str,
         list_tmp1 = []
         list_tmp2 = []
         mat_tmp[-1,-1] = -99999.
-        changemat([-1,-1],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
+        ttused = [str([root1.node_count()-1, root2.node_count()-1])]
+        changemat([-1,-1],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2, ttused)
         
         mat_tmp2 = deepcopy(matrix_values)
         tree_tmp1 = []
@@ -576,7 +582,9 @@ def scoremat(TreeSeqFile:str,
                             'Root1_prune':where_prune(list_tmp1, list(map(lambda x:x.label,root1.leaves([])))),
                             'Root2_prune':where_prune(list_tmp2, list(map(lambda x:x.label,root2.leaves([])))),
                             'row':root1.node_count()-1, 
-                            'col':root2.node_count()-1})
+                            'col':root2.node_count()-1,
+                            'used':ttused
+                             })
 
         return({'matrix':mmatrix, 
                 'tree1_leaves_nodename': oroot1_label2celltype[1],
@@ -603,7 +611,8 @@ def scoremat(TreeSeqFile:str,
             list_tmp1 = []
             list_tmp2 = []
             mat_tmp[del_i_index,del_j_index] = -99999.
-            changemat([del_i_index,del_j_index],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
+            ttused = [str([del_i_index, del_j_index])]
+            changemat([del_i_index,del_j_index],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2, ttused)
             
             tree_tmp1 = []
             tree_tmp2 = []
@@ -619,21 +628,22 @@ def scoremat(TreeSeqFile:str,
             #    list_tmp1.insert(0,lllnode[del_i_index].label)
             #if list_tmp2[0] != llllnode[del_j_index].label:    
             #    list_tmp2.insert(0,llllnode[del_j_index].label)
-            if jjj > 0:
-                if len(scorelist[-1]['Root1_match']) == 0:
-                    percent = 0
-                else:
-                    percent = (len(list(set(list_tmp1) - set(scorelist[-1]['Root1_match'])) + list(set(scorelist[-1]['Root1_match']) - set(list_tmp1))) / len(scorelist[-1]['Root1_match']))*100.
-                if round(percent) < diff:
-                    #print(round(percent))
+            if jjj > 0 and diff > 0:
+                for i in range(len(scorelist)):
+                    percent = min(percent, len(set(scorelist[i]['used']) - set(ttused)) / len(scorelist[i]['used'])*100.)
+                
+                while percent < float(diff):
                     maxscore = np.max(mat_tmp)
+                    if (maxscore + 99999.) < 0.01:
+                        break
                     del_i_index = np.where(mat_tmp==np.max(mat_tmp))[0][0]
                     del_j_index = np.where(mat_tmp==np.max(mat_tmp))[1][0]
                     
                     list_tmp1 = []
                     list_tmp2 = []
                     mat_tmp[del_i_index,del_j_index] = -99999.
-                    changemat([del_i_index,del_j_index],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2)
+                    ttused = [str([del_i_index, del_j_index])]
+                    changemat([del_i_index,del_j_index],ttrace, trace_value,mat_tmp, list_tmp1, list_tmp2, ttused)
                     
                     tree_tmp1 = []
                     tree_tmp2 = []
@@ -644,6 +654,9 @@ def scoremat(TreeSeqFile:str,
                     tree_tmp4 = []
                     mat_tmp3[del_i_index,del_j_index] = -99999.
                     getmatchtree([del_i_index,del_j_index],lllnode_label, llllnode_label, trace_value,mat_tmp3, tree_tmp3, tree_tmp4)
+                    percent = 100
+                    for i in range(len(scorelist)):
+                        percent = min(percent, len(set(scorelist[i]['used']) - set(ttused)) / len(scorelist[i]['used'])*100.)
                     
             tree_tmp1.append(';')
             tree_tmp2.append(';')
@@ -668,7 +681,9 @@ def scoremat(TreeSeqFile:str,
                             'Root1_prune':where_prune(list_tmp1, list(map(lambda x:x.label,lllnode[del_i_index].leaves([])))),
                             'Root2_prune':where_prune(list_tmp2, list(map(lambda x:x.label,llllnode[del_j_index].leaves([])))),
                             'row':del_i_index, 
-                            'col':del_j_index})
+                            'col':del_j_index,
+                            'used':ttused
+                             })
 
         return({'matrix':mmatrix, 
                 'tree1_leaves_nodename': oroot1_label2celltype[1],

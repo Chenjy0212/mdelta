@@ -30,19 +30,21 @@ def ReadTreeSeq(TreeSeqFilePath):
     #print(content)
     return content.replace(';', '')
 
-def Scoredict(lllleaf, llllleaf, mv:float):
+def Scoredict(lllleaf, llllleaf, mav:float, miv:float):
     #如果是自动生成的话
     #可以用到笛卡尔积
     score_dict = {}
-    #for i in itertools.product(set(lllleaf), set(llllleaf)):
-    #    score_dict[i[0].nodeobj+'_'+i[1].nodeobj] = float(random.randint(-2,2))
+    for i in itertools.product(set(lllleaf), set(llllleaf)):
+        score_dict[i[0].nodeobj+'_'+i[1].nodeobj] = float(miv)
     #score_dict[i[0].nodeobj+'_'+i[1].nodeobj] = random.random()/10
     #print(score_dict)
 
     #或者用到相同节点才匹配
     #score_dict = {}
-    for i in lllleaf + llllleaf:
-        score_dict[i.nodeobj+'_'+i.nodeobj] = mv
+    for i in lllleaf:
+        score_dict[i.nodeobj+'_'+i.nodeobj] = float(mav)
+    for i in llllleaf:
+        score_dict[i.nodeobj+'_'+i.nodeobj] = float(mav)
     return score_dict
 
 def reverseScore(Score, matchScore:float):
